@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  14 OCT 2016 00:39
-=======
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (MiKTeX 2.9) (preloaded format=pdflatex 2016.9.27)  13 OCT 2016 22:09
->>>>>>> 46304ff0ac9bc7027d6a400e6fd32cfbca9cd10f
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (MiKTeX 2.9) (preloaded format=pdflatex 2016.9.27)  14 OCT 2016 11:18
 entering extended mode
 **./sigplanconf-template.tex
 (sigplanconf-template.tex
@@ -282,41 +278,29 @@ LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <18> not available
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <11> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 79.
 
-<<<<<<< HEAD
-Underfull \vbox (badness 1742) has occurred while \output is active []
-=======
-Overfull \hbox (12.0424pt too wide) in paragraph at lines 130--131
+Overfull \hbox (12.0424pt too wide) in paragraph at lines 159--161
 \OT1/ptm/m/n/9 ments. This will al-low pro-gram-mers to prop-erly ver-ify non-t
 erminating
  []
 
 (sigplanconf-template.bbl
->>>>>>> 46304ff0ac9bc7027d6a400e6fd32cfbca9cd10f
+Underfull \vbox (badness 1466) has occurred while \output is active []
 
-
-<<<<<<< HEAD
-(./sigplanconf-template.bbl
-Missing character: There is no â in font ptmr7t!
-Missing character: There is no € in font ptmr7t!
-Missing character: There is no “ in font ptmr7t!
-Missing character: There is no â in font ptmr7t!
-Missing character: There is no € in font ptmr7t!
-Missing character: There is no “ in font ptmr7t!
-Missing character: There is no â in font ptmr7t!
-Missing character: There is no € in font ptmr7t!
-Missing character: There is no “ in font ptmr7t!
- [1{/usr/local/texlive/2015/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
-=======
-)
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 177.
  [1{C:/Users/Tristan/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}
->>>>>>> 46304ff0ac9bc7027d6a400e6fd32cfbca9cd10f
 
 
 Non-PDF special ignored!
 
 ]
-<<<<<<< HEAD
+Missing character: There is no â in font ptmr7t!
+Missing character: There is no € in font ptmr7t!
+Missing character: There is no “ in font ptmr7t!
+Missing character: There is no â in font ptmr7t!
+Missing character: There is no € in font ptmr7t!
+Missing character: There is no “ in font ptmr7t!
+Missing character: There is no â in font ptmr7t!
+Missing character: There is no € in font ptmr7t!
+Missing character: There is no “ in font ptmr7t!
 Missing character: There is no Ã in font ptmr7t!
 Missing character: There is no ¤ in font ptmr7t!
 Missing character: There is no Ã in font ptmr7t!
@@ -325,62 +309,35 @@ Missing character: There is no â in font ptmr7t!
 Missing character: There is no € in font ptmr7t!
 Missing character: There is no “ in font ptmr7t!
 )
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 180.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 208.
  [2
 
 ]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 180.
- (./sigplanconf-template.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 180.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 180.
-Package rerunfilecheck Info: File `sigplanconf-template.out' has not changed.
-(rerunfilecheck)             Checksum: A8EDEF5E1269A23AA74BCABF94B4DC5F;183.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 180.
- ) 
-Here is how much of TeX's memory you used:
- 5711 strings out of 493089
- 83028 string characters out of 6134842
- 180123 words of memory out of 5000000
- 9153 multiletter control sequences out of 15000+600000
- 19411 words of font info for 42 fonts, out of 8000000 for 9000
- 1141 hyphenation exceptions out of 8191
- 30i,5n,30p,244b,459s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/local/texlive/2015/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/t
-exlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmss9.pfb></usr/local/tex
-live/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb></usr/local/texli
-ve/2015/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2015/te
-xmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2015/texmf-dist/f
-onts/type1/urw/times/utmri8a.pfb>
-Output written on sigplanconf-template.pdf (2 pages, 67133 bytes).
-PDF statistics:
- 86 PDF objects out of 1000 (max. 8388607)
- 76 compressed objects within 1 object stream
- 23 named destinations out of 1000 (max. 500000)
-=======
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 177.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 208.
  (sigplanconf-template.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 177.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 177.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 208.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 208.
 Package rerunfilecheck Info: File `sigplanconf-template.out' has not changed.
 (rerunfilecheck)             Checksum: ECC7CBA2D577EE0C51438447C9694401;187.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 177.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 208.
  ) 
 Here is how much of TeX's memory you used:
- 5661 strings out of 493335
- 82045 string characters out of 3136674
- 178275 words of memory out of 3000000
- 9169 multiletter control sequences out of 15000+200000
- 12967 words of font info for 27 fonts, out of 3000000 for 9000
+ 5729 strings out of 493335
+ 83248 string characters out of 3136674
+ 181275 words of memory out of 3000000
+ 9214 multiletter control sequences out of 15000+200000
+ 19411 words of font info for 42 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 30i,4n,30p,568b,320s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 30i,5n,30p,239b,447s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Program Files (x86)/MiKTeX 2.9/fonts/enc/dvips/fontname/8r.enc}<C:/Progra
 m Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmss9.pfb><C:/Program F
-iles (x86)/MiKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Program Files (x86)/
-MiKTeX 2.9/fonts/type1/urw/times/utmr8a.pfb>
-Output written on sigplanconf-template.pdf (1 page, 46868 bytes).
+iles (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmtt8.pfb><C:/Program File
+s (x86)/MiKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Program Files (x86)/MiK
+TeX 2.9/fonts/type1/urw/times/utmr8a.pfb><C:/Program Files (x86)/MiKTeX 2.9/fon
+ts/type1/urw/times/utmri8a.pfb>
+Output written on sigplanconf-template.pdf (2 pages, 79947 bytes).
 PDF statistics:
- 51 PDF objects out of 1000 (max. 8388607)
- 13 named destinations out of 1000 (max. 500000)
->>>>>>> 46304ff0ac9bc7027d6a400e6fd32cfbca9cd10f
+ 89 PDF objects out of 1000 (max. 8388607)
+ 24 named destinations out of 1000 (max. 500000)
  33 words of extra memory for PDF output out of 10000 (max. 10000000)
 
