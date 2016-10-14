@@ -1,8 +1,7 @@
-This is BibTeX, Version 0.99d (TeX Live 2015)
-Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
-The top-level auxiliary file: sigplanconf-template.aux
+This is BibTeX, Version 0.99dThe top-level auxiliary file: sigplanconf-template.aux
 The style file: abbrvnat.bst
 Database file #1: sigplanconf.bib
+<<<<<<< HEAD
 You've used 9 entries,
             2773 wiz_defined-function locations,
             678 strings with 6824 characters,
@@ -44,3 +43,6 @@ warning$ -- 0
 while$ -- 41
 width$ -- 0
 write$ -- 163
+=======
+(There was 1 error message)
+>>>>>>> 46304ff0ac9bc7027d6a400e6fd32cfbca9cd10f
