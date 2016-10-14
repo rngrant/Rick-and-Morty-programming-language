@@ -1,48 +1,48 @@
-This is BibTeX, Version 0.99dThe top-level auxiliary file: sigplanconf-template.aux
+This is BibTeX, Version 0.99d (TeX Live 2015)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: sigplanconf-template.aux
 The style file: abbrvnat.bst
 Database file #1: sigplanconf.bib
-<<<<<<< HEAD
-You've used 9 entries,
+Warning--empty year in esolang
+You've used 10 entries,
             2773 wiz_defined-function locations,
-            678 strings with 6824 characters,
-and the built_in function-call counts, 4846 in all, are:
-= -- 477
+            683 strings with 6893 characters,
+and the built_in function-call counts, 5092 in all, are:
+= -- 502
 > -- 239
 < -- 8
-+ -- 82
++ -- 83
 - -- 72
-* -- 402
-:= -- 736
-add.period$ -- 46
-call.type$ -- 9
-change.case$ -- 51
-chr.to.int$ -- 8
-cite$ -- 18
-duplicate$ -- 220
-empty$ -- 377
+* -- 417
+:= -- 758
+add.period$ -- 49
+call.type$ -- 10
+change.case$ -- 55
+chr.to.int$ -- 9
+cite$ -- 21
+duplicate$ -- 235
+empty$ -- 412
 format.name$ -- 87
-if$ -- 1040
+if$ -- 1101
 int.to.chr$ -- 2
 int.to.str$ -- 1
 missing$ -- 9
-newline$ -- 70
+newline$ -- 75
 num.names$ -- 36
-pop$ -- 78
+pop$ -- 89
 preamble$ -- 1
-purify$ -- 42
+purify$ -- 45
 quote$ -- 0
-skip$ -- 174
+skip$ -- 189
 stack$ -- 0
-substring$ -- 210
-swap$ -- 45
+substring$ -- 212
+swap$ -- 46
 text.length$ -- 3
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 99
-warning$ -- 0
+type$ -- 110
+warning$ -- 1
 while$ -- 41
 width$ -- 0
-write$ -- 163
-=======
-(There was 1 error message)
->>>>>>> 46304ff0ac9bc7027d6a400e6fd32cfbca9cd10f
+write$ -- 174
+(There was 1 warning)

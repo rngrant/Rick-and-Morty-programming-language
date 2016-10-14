@@ -132,26 +132,35 @@ resources to assist us will done be extrodinarily difficult.
 Temporal logic can be an extremely useful concept in various 
 computing problems, particularly related to program verification. 
 In order to ensure, for example, that a certain state is eventually
-reached,
- we need temporal logic. Similarly, we can use temporal logic to
- ensure
- that certain eventualities are never reached. A final important
- applicatio
-n is to ensure "fairness" in multi-threaded systems. A program may, 
-for example, want to ensure that if a process makes a certain request 
-often enough, that request is eventually fulfilled.
+reached, or that some data will eventually have some type, we can use
+temporal logic. We similarly, we can use checking with temporal logic to
+ ensure that data that should not be accessed again, such as pointers,
+ are never used again after a certain point. A final important 
+ application we can use temporal logic for is to ensure "fairness" in
+ multi-threaded systems. A program may, for example, want to ensure 
+ that if a thread wants to use a certain data that request is
+ eventually fulfilled, while also ensuring that other threads won't
+ have the data that they are using suddenly change.
 
-Thus, we propose to use Haskell to develop a simple Turing-complete
+ Thus, we propose to use Haskell to develop a simple Turing-complete
  computer language featuring temporal logic and some simple
- multi-threading
- utilities. Without multi-threading, we cannot use the temporal logic 
-capabilities to their full potential. GHC already supports implicit
-parallelism.
- Thus, we can simply use GHC's implementation as the foundation
- of our multi-threading capabilities. 
+ multi-threading utilities that are also simple to the user.
+ Because of the advantages that using temporal logic gives to
+ concurrent operations, we cannot use the temporal logic 
+ capabilities to its full potential without this multithreading.
+ GHC already supports implicit parallelism. Thus, we can 
+ simply use GHC's implementation as the foundation
+ of our multi-threading capabilities. We also intend for our 
+ language to support adding various temporal logic
+ statements regarding values to the program.
+ This will allow programmers to properly verify non-terminating
+ applications. 
 
-Our language will also support various temporal logic statements. 
-This will allow programmers to properly verify non-terminating applications. 
+ Due to the scope of this challenge, and the variety of choices that
+ are possible in language design, we are not entirely sure of the
+ final design of our languages. We will continually be in communication
+ with our professor while making the decisions about what language
+ features to focus on in our limited time.
 \section{Timeline}
 \begin{enumerate}
 \item    Friday 11/4: project checkpoint 1 due:
