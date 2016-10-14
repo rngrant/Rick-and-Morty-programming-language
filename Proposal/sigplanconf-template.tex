@@ -101,7 +101,9 @@ Parallel timlines and alternative universes
 \section{Prior Work}
 
 \section{Proposed Work}
+Temporal logic can be an extremely useful concept in various computing problems, particularly related to program verification. In order to ensure, for example, that a certain state is eventually reached, we need temporal logic. Similarly, we can use temporal logic to ensure that certain eventualities are never reached. A final important application is to ensure "fairness" in multi-threaded systems. A program may, for example, want to ensure that if a process makes a certain request often enough, that request is eventually fulfilled.
 
+Thus, we propose to use Haskell to develop a simple Turing-complete computer language featuring temporal logic and some simple multi-threading utilities. Without multi-threading, we cannot use the temporal logic capabilities to their full potential. GHC already supports implicit parallelism, but 
 \section{Timeline}
 
 
