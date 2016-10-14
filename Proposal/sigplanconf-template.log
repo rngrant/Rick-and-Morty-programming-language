@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  13 OCT 2016 20:04
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  14 OCT 2016 00:39
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -278,42 +278,63 @@ LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <18> not available
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <11> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 79.
 
+Underfull \vbox (badness 1742) has occurred while \output is active []
+
+
 (./sigplanconf-template.bbl
-
-Package natbib Warning: Empty `thebibliography' environment on input line 8.
-
-)
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 164.
+Missing character: There is no â in font ptmr7t!
+Missing character: There is no € in font ptmr7t!
+Missing character: There is no “ in font ptmr7t!
+Missing character: There is no â in font ptmr7t!
+Missing character: There is no € in font ptmr7t!
+Missing character: There is no “ in font ptmr7t!
+Missing character: There is no â in font ptmr7t!
+Missing character: There is no € in font ptmr7t!
+Missing character: There is no “ in font ptmr7t!
  [1{/usr/local/texlive/2015/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
 
 
 Non-PDF special ignored!
 
 ]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 164.
+Missing character: There is no Ã in font ptmr7t!
+Missing character: There is no ¤ in font ptmr7t!
+Missing character: There is no Ã in font ptmr7t!
+Missing character: There is no ¶ in font ptmr7t!
+Missing character: There is no â in font ptmr7t!
+Missing character: There is no € in font ptmr7t!
+Missing character: There is no “ in font ptmr7t!
+)
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 180.
+ [2
+
+]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 180.
  (./sigplanconf-template.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 164.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 164.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 180.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 180.
 Package rerunfilecheck Info: File `sigplanconf-template.out' has not changed.
 (rerunfilecheck)             Checksum: A8EDEF5E1269A23AA74BCABF94B4DC5F;183.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 164.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 180.
  ) 
 Here is how much of TeX's memory you used:
- 5647 strings out of 493089
- 81882 string characters out of 6134842
- 177123 words of memory out of 5000000
- 9111 multiletter control sequences out of 15000+600000
- 12967 words of font info for 27 fonts, out of 8000000 for 9000
+ 5711 strings out of 493089
+ 83028 string characters out of 6134842
+ 180123 words of memory out of 5000000
+ 9153 multiletter control sequences out of 15000+600000
+ 19411 words of font info for 42 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 30i,4n,30p,244b,320s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 30i,5n,30p,244b,459s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2015/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/t
 exlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmss9.pfb></usr/local/tex
-live/2015/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2015/
-texmf-dist/fonts/type1/urw/times/utmr8a.pfb>
-Output written on sigplanconf-template.pdf (1 page, 40772 bytes).
+live/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb></usr/local/texli
+ve/2015/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2015/te
+xmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2015/texmf-dist/f
+onts/type1/urw/times/utmri8a.pfb>
+Output written on sigplanconf-template.pdf (2 pages, 67133 bytes).
 PDF statistics:
- 53 PDF objects out of 1000 (max. 8388607)
- 46 compressed objects within 1 object stream
- 13 named destinations out of 1000 (max. 500000)
+ 86 PDF objects out of 1000 (max. 8388607)
+ 76 compressed objects within 1 object stream
+ 23 named destinations out of 1000 (max. 500000)
  33 words of extra memory for PDF output out of 10000 (max. 10000000)
 
