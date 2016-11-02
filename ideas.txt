@@ -1,0 +1,29 @@
+BOp == BOp
+  + == Plus
+  - == Minus
+  * == Times
+  / == DividedBy
+  Mod == Mod
+  = == Equals
+  > == GreaterThan
+  < == LessThan
+  && == And
+  || == Or
+  
+UOp == UOp
+  Not == Not
+  Neg == Cronenberg
+Exp == Exp
+Value == Value
+  Int == Schmeckle
+  Float == Flurbo
+  Bool == Gazorpazorp
+Eval == WubbaLubbaDubDub
+Type == Type
+Typecheck == Typecheck
+
+Print == Say
+
+Lambda == Meeseek
+
+List formation == Take this x and shove it all the way up to y
