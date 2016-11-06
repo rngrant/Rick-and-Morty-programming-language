@@ -56,14 +56,14 @@ psub = do
   whitespace
   return $ EBin Sub e1 e2
 
-pexp = do
+pexp = do    --simpleExper7
   e <- term7
 
   maybeOpSuffix e
 
   where
     maybeOpSuffix e = 
-      addSuffix e <|> subSuffix e <|> return e
+      try $ addSuffix e <|> subSuffix e <|> return e
         where
           addSuffix e = do
             whitespace
@@ -80,7 +80,7 @@ pexp = do
 
 term7 = pterm pexp
 
-pterm simpleExpr = base  <|> parensEN simpleExpr --term
+pterm simpleExpr = try $ base <|> parensEN simpleExpr --term
   where base = pint
 
 pint :: Parser Exp
@@ -89,7 +89,7 @@ pint = do
   return $ EIntLit (read n)
 
 parseExp :: String -> Either ParseError Exp
-parseExp src = parse pexp "" src
+parseExp src = parse term7 "" src
 
 {-main :: IO()
 main = do
