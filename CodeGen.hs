@@ -1,5 +1,11 @@
 {-# LANGUAGE GADTs #-}
 
+module CodeGen where
+
+import Text.Parsec
+import Text.Parsec.String
+
+
 data BOp where
   Add :: BOp
   Sub :: BOp
@@ -14,16 +20,16 @@ data BOp where
   deriving (Eq)
 
 instance Show BOp where
-  show Add = " Plus "
-  show Sub = " Minus "
-  show Mul = " Times "
-  show Div = " DividedBy "
-  show Mod = " Mod "
-  show Equals = " Equals "
-  show GreaterThan = " GreaterThan "
-  show LessThan = " LessThan "
-  show And = " And "
-  show Or = " Or "
+  show Add = "Plus"
+  show Sub = "Minus"
+  show Mul = "Times"
+  show Div = "DividedBy"
+  show Mod = "Mod"
+  show Equals = "Equals"
+  show GreaterThan = "GreaterThan"
+  show LessThan = "LessThan"
+  show And = "And"
+  show Or = "Or"
 
 data UOp where
   Neg :: UOp
@@ -31,8 +37,8 @@ data UOp where
   deriving (Eq)
 
 instance Show UOp where
-  show Neg = " Cronenberg "
-  show Not = " Not "
+  show Neg = "Cronenberg"
+  show Not = "Not"
 
 data Exp where
   EIntLit :: Int -> Exp
@@ -40,7 +46,9 @@ data Exp where
   EUOp :: UOp -> Exp -> Exp
   EBin :: BOp -> Exp -> Exp -> Exp
   EIf :: Exp -> Exp -> Exp -> Exp
+  EParens :: Exp -> Exp
   deriving (Eq, Show)
+
 
 say :: Exp -> String
 say (EIntLit n) = show n
@@ -92,6 +100,7 @@ eval (EIf cond e1 e2) = case eval cond of
   Just (VBool True) -> eval e1
   Just (VBool False) -> eval e2
   _ -> Nothing
+eval (EParens e) = eval e
 
 data Typ where
   TInt :: Typ
@@ -106,6 +115,7 @@ expectTypes t1 e1 t2 e2 result = case (typecheck e1, typecheck e2) of
   _ -> Nothing
 
 typecheck :: Exp -> Maybe Typ
+typecheck (EParens e) = typecheck e
 typecheck (EIntLit n) = Just TInt
 typecheck (EBoolLit b) = Just TBool
 typecheck (EUOp Not b) =
@@ -132,9 +142,10 @@ typecheck (EIf c e1 e2) =
       (Just t1, Just t2) -> if t1 == t2 then Just t1 else Nothing
     _ -> Nothing
 
-safeEval :: Exp -> Maybe Value
-safeEval e =
+safeEval :: Either ParseError Exp -> Maybe Value
+safeEval (Right e) =
   case typecheck e of
     Just _ -> eval e
     _      -> Nothing
+safeEval (Left e)= Nothing
 

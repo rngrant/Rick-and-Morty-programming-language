@@ -1,9 +1,17 @@
-import System.IO
-import Control.Monad
-import Text.ParserCombinators.Parsec
-import Text.ParserCombinators.Parsec.Expr
-import Text.ParserCombinators.Parsec.Language
-import qualified Text.ParserCombinators.Parsec.Token as Token
+module Lexer where
+
+import Control.Monad 
+import Text.Parsec
+import Text.Parsec.String
+import CodeGen
+
+--import System.IO
+--import System.Environment
+--import Control.Monad
+--import Text.ParserCombinators.Parsec
+--import Text.ParserCombinators.Parsec.Expr
+--import Text.ParserCombinators.Parsec.Language
+--import qualified Text.ParserCombinators.Parsec.Token as Token
 
 {-data Token where
   TInt :: Int -> Token
@@ -16,7 +24,78 @@ import qualified Text.ParserCombinators.Parsec.Token as Token
   TEquals :: Token
   TGreaterThan :: Token
   TLessThan :: Token -}
-  
+
+parens = do
+  whitespace
+  void $ string "you gotta"
+  whitespace
+  e <- pexp
+  whitespace
+  void $ string "Morty"
+  return (EParens e)
+
+whitespace = void $ many $ oneOf " \n\t"
+
+padd = do
+  whitespace
+  e1 <- pexp
+  whitespace
+  string "plus"
+  whitespace
+  e2 <- pint
+  whitespace
+  return $ EBin Add e1 e2
+
+psub = do
+  whitespace
+  e1 <- pexp
+  whitespace
+  string "minus"
+  whitespace
+  e2 <- pint
+  whitespace
+  return $ EBin Sub e1 e2
+
+pexp = do
+  try  padd <|> base  <|> parens
+    where base = pint
+
+pint :: Parser Exp
+pint = do
+  n <- many1 digit
+  return $ EIntLit (read n)
+
+parseExp :: String -> Either ParseError Exp
+parseExp src = parse pexp "" src
+
+{-main :: IO()
+main = do
+  args <- getArgs
+  putStrLn (readExpr (args !! 0))
+
+symbol :: Parser String
+symbol = oneOf ["Plus", "Minus", "Times", "Divided By"]
+
+readExpr :: String -> String
+readExpr input = case parse symbol "lisp" input of
+    Left err -> "No match: " ++ show err
+    Right val -> "Found value"
+
+data RickVal = Number Integer
+
+
+
+numericBinop :: (Integer -> Integer -> Integer) -> [RickVal] -> RickVal
+numericBinop op params = Number $ foldl1 op $ op $ map unpackNum params
+
+unpackNum :: LispVal -> Integer
+unpackNum (Number n) = n
+unpackNum (String n) = let parsed = reads n in
+                          if null parsed
+                            then 0
+                            else fst $ parsed !! 0
+unpack
+
 languageDef =
   emptyDef { Token.commentStart   = "{-"
            , Token.commentEnd     = "-}"
@@ -40,4 +119,4 @@ languageDef =
 }
 
 lexer = Token.makeTokenParser languageDef
-
+-}
