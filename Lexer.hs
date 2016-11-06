@@ -25,11 +25,11 @@ import CodeGen
   TGreaterThan :: Token
   TLessThan :: Token -}
 
-parens = do
+parensEN simpExprImpl = do
   whitespace
   void $ string "you gotta"
   whitespace
-  e <- pexp
+  e <- simpExprImpl
   whitespace
   void $ string "Morty"
   return (EParens e)
@@ -38,7 +38,7 @@ whitespace = void $ many $ oneOf " \n\t"
 
 padd = do
   whitespace
-  e1 <- pexp
+  e1 <- term7
   whitespace
   string "plus"
   whitespace
@@ -48,7 +48,7 @@ padd = do
 
 psub = do
   whitespace
-  e1 <- pexp
+  e1 <- term7
   whitespace
   string "minus"
   whitespace
@@ -57,8 +57,31 @@ psub = do
   return $ EBin Sub e1 e2
 
 pexp = do
-  try  padd <|> base  <|> parens
-    where base = pint
+  e <- term7
+
+  maybeOpSuffix e
+
+  where
+    maybeOpSuffix e = 
+      addSuffix e <|> subSuffix e <|> return e
+        where
+          addSuffix e = do
+            whitespace
+            string "plus"
+            whitespace
+            e1 <- term7
+            maybeOpSuffix (EBin Add e e1)
+          subSuffix e = do
+            whitespace
+            string "minus"
+            whitespace
+            e1 <- term7
+            maybeOpSuffix (EBin Sub e e1)
+
+term7 = pterm pexp
+
+pterm simpleExpr = base  <|> parensEN simpleExpr --term
+  where base = pint
 
 pint :: Parser Exp
 pint = do
