@@ -6,13 +6,24 @@ import Text.Parsec.String
 import Control.Applicative ((<*))
 import CodeGen
 
-paren = do
+parenA = do
   whitespace
   void $ string "you gotta"
   whitespace
-  e <- expr
+  e <- opa
   whitespace
   void $ string "Morty"
+  whitespace
+  return (EParens e)
+
+parenB = do
+  whitespace
+  void $ string "you gotta"
+  whitespace
+  e <- opb
+  whitespace
+  void $ string "Morty"
+  whitespace
   return (EParens e)
 
 whitespace = void $ many $ oneOf " \n\t"
@@ -88,6 +99,24 @@ numEq = do
   whitespace
   return $ EBin Equals e1 e2
 
+numLt = do
+  whitespace
+  e1 <- opa
+  whitespace
+  string "is less than"
+  e2 <- opa
+  whitespace
+  return $ EBin LessThan e1 e2
+
+numGt = do
+  whitespace
+  e1 <- opa
+  whitespace
+  string "is greater than"
+  e2 <- opa
+  whitespace
+  return $ EBin LessThan e1 e2
+
 --GRAMMAR--
 
 --expr -> opa | opb
@@ -108,32 +137,35 @@ opa = try padd <|> try psub <|> opa'
 
 opa' = try pmul <|> try pdiv <|> pterm
 
-pterm = try base <|> paren  --term
+pterm = try base <|> try parenA  --term
   where base = pint
 
 pint :: Parser Exp
 pint = do
+  whitespace
   n <- many1 digit
   whitespace
   return $ EIntLit (read n)
 
 --BOOL OPS--
 
-opb  = try band {-<|> try beq-} <|> try bor <|> opb'
-opb' = try numEq <|> {-try numLt <|> try numGt <|>-} bterm
-bterm = try base <|> paren
+opb  = try band <|> try bor <|> opb'
+opb' = try numEq <|> try numLt <|> try numGt <|> bterm
+bterm = try base <|> try parenB
   where base = try bRight <|> try bWrong
 
 bRight :: Parser Exp
 bRight = do
   whitespace
   string "right"
+  whitespace
   return $ EBoolLit True
 
 bWrong :: Parser Exp
 bWrong = do
   whitespace
   string "wrong"
+  whitespace
   return $ EBoolLit False
 
 parseExp :: String -> Either ParseError Exp
