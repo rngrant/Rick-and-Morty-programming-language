@@ -78,9 +78,9 @@
 
 \begin{abstract}
 For this project we will develop an esoteric programming language
-based on the popular cartoon, Rick and Morty. This programing
-language, which will support multithreading, will also make use of integrated Linear Temporal logic to ensure
-correctness. In addition, this language
+based on the popular cartoon Rick and Morty. This programing
+language will support multithreading and will also make use of integrated Linear Temporal logic to verify the
+correctness of multithreaded programs. In addition, this language
 is intended to be accessible enough to attract students and
 programmers unfamiliar with the concepts of temporal logic and parallelism.
 \end{abstract}
@@ -92,41 +92,37 @@ programmers unfamiliar with the concepts of temporal logic and parallelism.
 %keyword1, keyword2
 
 \section{Introduction}
-The popular TV show Rick and Morty often uses the concepts of
-Parallel timelines and alternate universes as a main theme in many
+The popular TV show Rick and Morty uses the concepts of
+parallel timelines and alternate universes as a main theme in many
 episodes. Given the popularity of the show and its relevance in pop
-culture, we decided that it would be an appropriate medium over
+culture, we decided that it would be an appropriate medium through
 which to introduce the concepts of multithreading and temporal logic.
 The language's syntax will include many references to the show,
 and thus be attractive to fans of the show. It will also make the use of
 temporal logic more whimsical and thus increase the topic's appeal to a diverse audience.
 
 Our final goal is to create a Turing complete language which satisfies
-the above conditions of reference, and also makes serious of the
-concepts of linear temporal programming.
+the above conditions of reference, and also makes serious use of linear temporal programming and its related concepts.
 
 \section{Prior Work}
  
 
-Linear Temoral Logic is a mathematical frameworks that deals with when
-statements are true over time. It has been used in programming for
+Linear Temoral Logic is a mathematical framework that deals with
+statements whose truth value can change over time. It has been used in programming for
 software verification, specificly in when working with concurrent
 programs\cite{AutomaticVerification, SimpleVerification}. Temporal
 Logic has also been used in declarative programming languages to
-increase the expressivness\cite{DeclarativeTemporal}. As far as we
-know, we could not find a non declartive programming language which
-made use of Temporal programming as part of the language. 
+increase the expressiveness\cite{DeclarativeTemporal}. We could not find a non declarative programming language that
+supports temporal logic. 
 
-Additional work that will be imporant to this project is language design.
+Additional work that will be important to this project comes from the field of language design.
 Language design is a field which has had a lot of focus directed
 towards it. There are currently hundreds of languages that
-have been created purely for exploration of creating interesting
-programming lanaguages, and the field of programming research is one
-which has been growing \cite{esolang}. It is easy to find advice on
+have been created purely to explore the bounds of programming languages, and the field of programming language research has been growing rapidly in recent years \cite{esolang}. It is easy to find advice on
 creating programming languages, such as that given by Dominic Orchard
-of the university of Cambridge \cite{4Rs}.  With large amount of work
+of the university of Cambridge \cite{4Rs}.  With the large amount of work
 that has been done on programming languages, we predict that finding
-resources to assist us will done be extrodinarily difficult.
+resources to assist us will not be extraordinarily difficult.
 
 \section{Proposed Work}
 Temporal logic can be an extremely useful concept in various 
@@ -161,6 +157,7 @@ temporal logic. We similarly, we can use checking with temporal logic to
  final design of our languages. We will continually be in communication
  with our professor while making the decisions about what language
  features to focus on in our limited time.
+
 \section{Timeline}
 \begin{enumerate}
 \item    Friday 11/4: project checkpoint 1 due:
