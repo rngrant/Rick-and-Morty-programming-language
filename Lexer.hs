@@ -26,7 +26,8 @@ parenB = do
   whitespace
   return (EParens e)
 
-whitespace = void $ many $ oneOf " \n\t"
+whitespace = void $ many $ oneOf " \t"
+crlf = many $ oneOf "\n"
 
 pmul = do
   whitespace
@@ -117,7 +118,38 @@ numGt = do
   whitespace
   return $ EBin LessThan e1 e2
 
+--STATEMENTS--
+
+sIf = do
+  whitespace
+  string "if"
+  whitespace
+  e1 <- opb
+  whitespace
+  string "then"
+  whitespace
+  s1 <- stmt `endBy` crlf
+  whitespace
+  string "otherwise"
+  whitespace
+  s2 <- stmt `endBy` crlf
+  whitespace
+  return $ SIf e1 s1 s2
+
+sDec = do
+  whitespace
+  e1 <- many1 char
+  whitespace
+  string "means"
+  whitespace
+  e2 <- expr
+  whitespace
+  return $ SDecl e1 e2
+
 --GRAMMAR--
+
+--stmt -> if | while | dec
+--if -> 'if' opb 'then' [stmt] 'otherwise' [stmt]
 
 --expr -> opa | opb
 
@@ -128,6 +160,8 @@ numGt = do
 --opb  -> opb' = opb | opb' and opb | opb' or opb | opb'
 --opb' -> opa = opa | opa < opa | opa > opa | bterm
 --bterm -> True | False | (opb)
+
+stmt = try sIf <|> try sDec {-<|> try sWhile-}
 
 expr = try opb <|> try opa
 
@@ -176,3 +210,49 @@ parseExp src = parse (expr <* eof) "" src
 --cond  -> "if" pbool "then" opa "else" opa
 
 
+
+
+
+--Code that didn't work but may be useful
+
+{-
+expr = chainl1 term addop
+term = chainl1 factor mulop
+factor = parenA <|> parseC
+
+addop = do{whitespace;
+           string "plus";
+           whitespace;
+           return (EBin Add);}
+  <|>   do{whitespace;
+           string "minus";
+           whitespace;
+           return (EBin Sub);}
+
+mulop = do{whitespace;
+           string "times";
+           whitespace;
+           return (EBin Mul);}
+  <|>   do{whitespace;
+           string "divided by";
+           whitespace;
+           return (EBin Div);}
+
+parseC = 
+  do
+    whitespace
+    n <- many1 digit
+    return $ EIntLit (read n)
+
+debug p input =
+  case parse p "" input of
+    Left err ->
+      do putStr "parse error"
+    Right x -> print x
+
+
+run p input =
+  case parse p "" input of
+    Left err -> Nothing
+    Right x -> safeEval (Right x)
+-}

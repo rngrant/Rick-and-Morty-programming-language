@@ -47,6 +47,7 @@ data Exp where
   EBin :: BOp -> Exp -> Exp -> Exp
   EIf :: Exp -> Exp -> Exp -> Exp
   EParens :: Exp -> Exp
+  EVar :: String -> Exp
   deriving (Eq, Show)
 
 
@@ -61,6 +62,14 @@ data Value where
   VInt :: Int -> Value
   VBool :: Bool -> Value
   deriving (Eq, Show)
+
+data Stmt where
+  SDecl :: String -> Exp -> Stmt
+  SWhile :: Exp -> [Stmt] -> Stmt
+  SIf :: Exp -> [Stmt] -> [Stmt] -> Stmt
+
+type Prog = [Stmt]
+type Env = [(String, Value)]
 
 evalIntBOp :: (Int -> Int -> Int) -> (Maybe Value) -> (Maybe Value) -> (Maybe Value)
 evalIntBOp op v1 v2 = case (v1, v2) of
@@ -77,30 +86,33 @@ evalIntBoolBOp op v1 v2 = case (v1, v2) of
   (Just (VInt n1), Just (VInt n2)) -> Just $ VBool $ op n1 n2
   _ -> Nothing
 
-eval :: Exp -> Maybe Value
-eval (EIntLit n) = Just $ VInt n
-eval (EBoolLit b) = Just $ VBool b
-eval (EUOp Neg e) = case eval e of
+eval :: Env -> Exp -> Maybe Value
+eval env (EVar x) = case lookup x env of
+  x -> x
+eval env (EIntLit n) = Just $ VInt n
+eval env (EBoolLit b) = Just $ VBool b
+eval env (EUOp Neg e) = case eval env e of
   Just (VInt n) -> Just $ VInt (-n)
   _ -> Nothing
-eval (EUOp Not e) = case eval e of
+eval env (EUOp Not e) = case eval env e of
   Just (VBool b) -> Just $ VBool $ not b
   _ -> Nothing
-eval (EBin Add e1 e2) = evalIntBOp (+) (eval e1) (eval e2)
-eval (EBin Sub e1 e2) = evalIntBOp (-) (eval e1) (eval e2)
-eval (EBin Mul e1 e2) = evalIntBOp (*) (eval e1) (eval e2)
-eval (EBin Div e1 e2) = evalIntBOp div (eval e1) (eval e2)
-eval (EBin Mod e1 e2) = evalIntBOp mod (eval e1) (eval e2)
-eval (EBin And e1 e2) = evalBoolBOp (&&) (eval e1) (eval e2)
-eval (EBin Or e1 e2) = evalBoolBOp (||) (eval e1) (eval e2)
-eval (EBin Equals e1 e2) = evalIntBoolBOp (==) (eval e1) (eval e2)
-eval (EBin LessThan e1 e2) = evalIntBoolBOp (<) (eval e1) (eval e2)
-eval (EBin GreaterThan e1 e2) = evalIntBoolBOp (>) (eval e1) (eval e2)
-eval (EIf cond e1 e2) = case eval cond of
-  Just (VBool True) -> eval e1
-  Just (VBool False) -> eval e2
+eval env (EBin Add e1 e2) = evalIntBOp (+) (eval env e1) (eval env e2)
+eval env (EBin Sub e1 e2) = evalIntBOp (-) (eval env e1) (eval env e2)
+eval env (EBin Mul e1 e2) = evalIntBOp (*) (eval env e1) (eval env e2)
+eval env (EBin Div e1 e2) = evalIntBOp div (eval env e1) (eval env e2)
+eval env (EBin Mod e1 e2) = evalIntBOp mod (eval env e1) (eval env e2)
+eval env (EBin And e1 e2) = evalBoolBOp (&&) (eval env e1) (eval env e2)
+eval env (EBin Or e1 e2) = evalBoolBOp (||) (eval env e1) (eval env e2)
+eval env (EBin Equals e1 e2) = evalIntBoolBOp (==) (eval env e1) (eval env e2)
+eval env (EBin LessThan e1 e2) = evalIntBoolBOp (<) (eval env e1) (eval env e2)
+eval env (EBin GreaterThan e1 e2) = evalIntBoolBOp (>) (eval env e1) (eval env e2)
+eval env (EIf cond e1 e2) = case eval env cond of
+  Just (VBool True) -> eval env e1
+  Just (VBool False) -> eval env e2
   _ -> Nothing
-eval (EParens e) = eval e
+eval env (EParens e) = eval env e
+
 
 data Typ where
   TInt :: Typ
@@ -145,7 +157,19 @@ typecheck (EIf c e1 e2) =
 safeEval :: Either ParseError Exp -> Maybe Value
 safeEval (Right e) =
   case typecheck e of
-    Just _ -> eval e
+    Just _ -> eval [] e
     _      -> Nothing
 safeEval (Left e)= Nothing
 
+exec :: Env -> Stmt -> (Env, [Stmt])
+exec env (SDecl x e) = undefined
+exec env (SWhile e s) = undefined
+exec env (SIf e (x:xs) (y:ys)) =
+  case eval env e of
+    Just (VBool True)  -> exec $ fst (exec env x)
+    Just (VBool False) -> exec env y
+    _          -> error "Something broke"
+
+
+execList :: Env -> [Stmt] -> (Env, [Stmt])
+execList env (x:xs) = execList (fst (exec env x)
