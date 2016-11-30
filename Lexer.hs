@@ -173,8 +173,8 @@ parseExp src = parse (expr <* eof) "" src
 changeAssoc :: Exp -> Exp
 changeAssoc (EIntLit n) = (EIntLit n)
 changeAssoc (EBoolLit b) = (EBoolLit b)
-changeAssoc (EUOp Neg e) = EUOp Neg (changeAssoc e)
-changeAssoc (EUOp Not e) = EUOp Not (changeAssoc e)
+changeAssoc (EUOp Neg e) = (EUOp Neg (changeAssoc e))
+changeAssoc (EUOp Not e) = (EUOp Not (changeAssoc e))
 changeAssoc (EParens  e) = (EParens (changeAssoc e))
 changeAssoc (EBin Add e1 (EBin Add e2 e3)) =
             changeAssoc (EBin Add (EBin Add e1 e2) e3)
@@ -202,7 +202,7 @@ changeAssoc (EBin Mod e1 (EBin Div e2 e3)) =
             changeAssoc (EBin Div (EBin Mod e1 e2) e3)
 changeAssoc (EBin Mod e1 (EBin Mod e2 e3)) =
             changeAssoc (EBin Mod (EBin Mod e1 e2) e3)
-changeAssoc (EIf cond e1 e2)=(EIf (changeAssoc cond)
+changeAssoc (EIf cond e1 e2)= (EIf (changeAssoc cond)
                                   (changeAssoc e1)
                                   (changeAssoc e2))
 changeAssoc (EBin op e1 e2) = (EBin op (changeAssoc e1) (changeAssoc e2))
