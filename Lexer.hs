@@ -134,17 +134,26 @@ sIf = do
   whitespace
   s2 <- stmt `endBy` crlf
   whitespace
+  string "wubalubadubdub"
   return $ SIf e1 s1 s2
 
 sDec = do
   whitespace
-  e1 <- many1 char
+  s <- many1 letter
   whitespace
   string "means"
   whitespace
-  e2 <- expr
+  e <- expr
   whitespace
-  return $ SDecl e1 e2
+  return $ SDecl s e
+
+sPrint = do
+  whitespace
+  string "show me"
+  whitespace
+  s <- many1 letter
+  whitespace
+  return $ SPrint s
 
 --GRAMMAR--
 
@@ -161,7 +170,7 @@ sDec = do
 --opb' -> opa = opa | opa < opa | opa > opa | bterm
 --bterm -> True | False | (opb)
 
-stmt = try sIf <|> try sDec {-<|> try sWhile-}
+stmt = try sIf <|> try sDec <|> try sPrint {-<|> try sWhile-} 
 
 expr = try opb <|> try opa
 
@@ -202,57 +211,17 @@ bWrong = do
   whitespace
   return $ EBoolLit False
 
-parseExp :: String -> Either ParseError Exp
-parseExp src = parse (expr <* eof) "" src
+parseExp :: String -> Either ParseError Prog
+parseExp src = parse (many1 stmt <* eof) "" src
 
 
 --pbool -> int comp int | bool op pbool | bool
 --cond  -> "if" pbool "then" opa "else" opa
-
-
-
-
-
---Code that didn't work but may be useful
-
 {-
-expr = chainl1 term addop
-term = chainl1 factor mulop
-factor = parenA <|> parseC
-
-addop = do{whitespace;
-           string "plus";
-           whitespace;
-           return (EBin Add);}
-  <|>   do{whitespace;
-           string "minus";
-           whitespace;
-           return (EBin Sub);}
-
-mulop = do{whitespace;
-           string "times";
-           whitespace;
-           return (EBin Mul);}
-  <|>   do{whitespace;
-           string "divided by";
-           whitespace;
-           return (EBin Div);}
-
-parseC = 
-  do
-    whitespace
-    n <- many1 digit
-    return $ EIntLit (read n)
-
-debug p input =
-  case parse p "" input of
-    Left err ->
-      do putStr "parse error"
-    Right x -> print x
-
-
-run p input =
-  case parse p "" input of
-    Left err -> Nothing
-    Right x -> safeEval (Right x)
+main :: IO String
+main = do
+  file <- getContents
+  --let _ = stepProg [] (parseExp file)
+  let a = parseExp file
+  return a
 -}

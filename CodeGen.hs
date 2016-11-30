@@ -67,6 +67,8 @@ data Stmt where
   SDecl :: String -> Exp -> Stmt
   SWhile :: Exp -> [Stmt] -> Stmt
   SIf :: Exp -> [Stmt] -> [Stmt] -> Stmt
+  SPrint :: String -> Stmt
+  deriving (Eq, Show)
 
 type Prog = [Stmt]
 type Env = [(String, Value)]
@@ -162,14 +164,29 @@ safeEval (Right e) =
 safeEval (Left e)= Nothing
 
 exec :: Env -> Stmt -> (Env, [Stmt])
-exec env (SDecl x e) = undefined
+exec env (SDecl s e) =
+  case safeEval (Right e) of
+    Just val  ->
+      case lookup s env of
+        Just v  -> ((filter (\x -> fst x /= s) env) ++ [(s, val)], []) 
+        Nothing -> ((env ++ [(s , val)]), [])
+    Nothing -> error "You really fucked it up here: Unable to evaluate passed expression"
 exec env (SWhile e s) = undefined
-exec env (SIf e (x:xs) (y:ys)) =
+exec env (SPrint s) =
+  case lookup s env of
+    Just v -> let _ = do print v in (env, [])
+    Nothing -> error "You really fucked it up here: Variable not found"
+      
+exec env (SIf e s1 s2) =
   case eval env e of
-    Just (VBool True)  -> exec $ fst (exec env x)
-    Just (VBool False) -> exec env y
-    _          -> error "Something broke"
+    Just (VBool True)  -> (env, s1)
+    Just (VBool False) -> (env, s2)
+    _          -> error "You really fucked it up here: Unable to evaluate given boolean"
 
 
-execList :: Env -> [Stmt] -> (Env, [Stmt])
-execList env (x:xs) = execList (fst (exec env x)
+stepProg :: Env -> Either ParseError Prog -> (Env, Prog)
+stepProg _ (Left e) = error "Parse error"
+stepProg env (Right []) = (env, [])
+stepProg env (Right (s:prog)) =
+  let (env, prog') = exec env s
+  in (env, prog' ++ prog)
