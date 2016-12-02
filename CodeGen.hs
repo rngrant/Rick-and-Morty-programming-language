@@ -72,6 +72,7 @@ data Stmt where
 
 type Prog = [Stmt]
 type Env = [(String, Value)]
+type Print = [String]
 
 evalIntBOp :: (Int -> Int -> Int) -> (Maybe Value) -> (Maybe Value) -> (Maybe Value)
 evalIntBOp op v1 v2 = case (v1, v2) of
@@ -89,8 +90,7 @@ evalIntBoolBOp op v1 v2 = case (v1, v2) of
   _ -> Nothing
 
 eval :: Env -> Exp -> Maybe Value
-eval env (EVar x) = case lookup x env of
-  x -> x
+eval env (EVar x) = lookup x env
 eval env (EIntLit n) = Just $ VInt n
 eval env (EBoolLit b) = Just $ VBool b
 eval env (EUOp Neg e) = case eval env e of
@@ -156,6 +156,10 @@ typecheck (EIf c e1 e2) =
       (Just t1, Just t2) -> if t1 == t2 then Just t1 else Nothing
     _ -> Nothing
 
+
+printHelp :: Show a => a -> IO ()
+printHelp = print
+
 safeEval :: Either ParseError Exp -> Maybe Value
 safeEval (Right e) =
   case typecheck e of
@@ -163,30 +167,30 @@ safeEval (Right e) =
     _      -> Nothing
 safeEval (Left e)= Nothing
 
-exec :: Env -> Stmt -> (Env, [Stmt])
-exec env (SDecl s e) =
+exec :: Env -> Print -> Stmt -> ((Env, [Stmt]), Print)
+exec env _ (SDecl s e) =
   case safeEval (Right e) of
     Just val  ->
       case lookup s env of
-        Just v  -> ((filter (\x -> fst x /= s) env) ++ [(s, val)], []) 
-        Nothing -> ((env ++ [(s , val)]), [])
+        Just v  -> (((filter (\x -> fst x /= s) env) ++ [(s, val)], []),[]) 
+        Nothing -> (((env ++ [(s , val)]), []),[])
     Nothing -> error "You really fucked it up here: Unable to evaluate passed expression"
-exec env (SWhile e s) = undefined
-exec env (SPrint s) =
+exec env _ (SWhile e s) = undefined
+exec env prt (SPrint s) =
   case lookup s env of
-    Just v -> let _ = do print v in (env, [])
+    Just v -> ((env, []), [show v])
     Nothing -> error "You really fucked it up here: Variable not found"
       
-exec env (SIf e s1 s2) =
+exec env _ (SIf e s1 s2) =
   case eval env e of
-    Just (VBool True)  -> (env, s1)
-    Just (VBool False) -> (env, s2)
+    Just (VBool True)  -> ((env, s1),[])
+    Just (VBool False) -> ((env, s2),[])
     _          -> error "You really fucked it up here: Unable to evaluate given boolean"
 
 
-stepProg :: Env -> Either ParseError Prog -> (Env, Prog)
-stepProg _ (Left e) = error "Parse error"
-stepProg env (Right []) = (env, [])
-stepProg env (Right (s:prog)) =
-  let (env, prog') = exec env s
-  in (env, prog' ++ prog)
+stepProg :: Env -> Print -> Either ParseError Prog -> ((Env, Prog),Print)
+stepProg _  _(Left e) = error "Parse error"
+stepProg env prt (Right []) = ((env, []),prt)
+stepProg env prt (Right (s:prog)) =
+  let ((env', prog'), prt') = exec env prt s
+    in stepProg env' (prt ++ prt') (Right (prog' ++ prog))

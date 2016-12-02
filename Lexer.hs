@@ -26,7 +26,7 @@ parenB = do
   whitespace
   return (EParens e)
 
-whitespace = void $ many $ oneOf " \t"
+whitespace = void $ many $ oneOf " \t\n"
 crlf = many $ oneOf "\n"
 
 pmul = do
@@ -180,7 +180,7 @@ opa = try padd <|> try psub <|> opa'
 
 opa' = try pmul <|> try pdiv <|> pterm
 
-pterm = try base <|> try parenA  --term
+pterm = try base <|> try parenA <|> try pvar
   where base = pint
 
 pint :: Parser Exp
@@ -194,7 +194,7 @@ pint = do
 
 opb  = try band <|> try bor <|> opb'
 opb' = try numEq <|> try numLt <|> try numGt <|> bterm
-bterm = try base <|> try parenB
+bterm = try base <|> try parenB <|> try pvar
   where base = try bRight <|> try bWrong
 
 bRight :: Parser Exp
@@ -211,17 +211,30 @@ bWrong = do
   whitespace
   return $ EBoolLit False
 
+--VARS--
+
+pvar :: Parser Exp
+pvar = do
+  whitespace
+  v <- many1 letter
+  whitespace
+  return $ EVar v
+
 parseExp :: String -> Either ParseError Prog
 parseExp src = parse (many1 stmt <* eof) "" src
 
 
 --pbool -> int comp int | bool op pbool | bool
 --cond  -> "if" pbool "then" opa "else" opa
-{-
+
 main :: IO String
 main = do
   file <- getContents
-  --let _ = stepProg [] (parseExp file)
-  let a = parseExp file
-  return a
--}
+  --putStrLn file
+  {-case parseExp file of
+    Left p -> return "error"
+    Right e -> do
+      return $ concat $ map show e-}
+  let ((_,_),prt) = stepProg [] [] (parseExp file)
+  --let a = parseExp file
+  return $ concat prt
