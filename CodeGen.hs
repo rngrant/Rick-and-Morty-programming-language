@@ -20,10 +20,10 @@ data BOp where
   deriving (Eq)
 
 instance Show BOp where
-  show Add = "Plus"
-  show Sub = "Minus"
-  show Mul = "Times"
-  show Div = "DividedBy"
+  show Add = "Add"
+  show Sub = "Sub"
+  show Mul = "Mul"
+  show Div = "Div"
   show Mod = "Mod"
   show Equals = "Equals"
   show GreaterThan = "GreaterThan"
@@ -155,6 +155,7 @@ typecheck (EIf c e1 e2) =
     Just TBool -> case (typecheck e1, typecheck e2) of
       (Just t1, Just t2) -> if t1 == t2 then Just t1 else Nothing
     _ -> Nothing
+--typecheck (SDecl _ e) = typecheck e
 
 
 printHelp :: Show a => a -> IO ()
@@ -169,13 +170,17 @@ safeEval (Left e)= Nothing
 
 exec :: Env -> Print -> Stmt -> ((Env, [Stmt]), Print)
 exec env _ (SDecl s e) =
-  case safeEval (Right e) of
+  case eval env e of
     Just val  ->
       case lookup s env of
         Just v  -> (((filter (\x -> fst x /= s) env) ++ [(s, val)], []),[]) 
         Nothing -> (((env ++ [(s , val)]), []),[])
     Nothing -> error "You really fucked it up here: Unable to evaluate passed expression"
-exec env _ (SWhile e s) = undefined
+exec env _ (SWhile e s) =
+  case eval env e of
+    Just (VBool True) -> ((env, (s ++ [SWhile e s])),[])
+    Just (VBool False) -> ((env, []),[])
+    Nothing -> error "You really fucked it up here: Passed expression not resolved to boolean"
 exec env prt (SPrint s) =
   case lookup s env of
     Just v -> ((env, []), [show v])

@@ -1,0 +1,29 @@
+i means 1
+
+while i is less than 100 do this for grandpa
+
+  j means 1
+
+  while j is less than i do this for grandpa
+
+    notFound means True
+
+    if i mod j is the same as 0 then
+      notFound means False
+    otherwise
+      notFound means True
+    wubalubadubdub
+
+    j means j plus 1
+
+  thanks Summer
+
+  if notFound then
+    print i
+  otherwise
+    notFound means True
+  wubalubadubdub
+
+  i means i plus 1
+
+thanks Summer

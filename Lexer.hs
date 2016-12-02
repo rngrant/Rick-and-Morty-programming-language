@@ -49,6 +49,16 @@ pdiv = do
   whitespace
   return $ EBin Div e1 e2
 
+pmod = do
+  whitespace
+  e1 <- pterm
+  whitespace
+  string "mod"
+  whitespace
+  e2 <- opa'
+  whitespace
+  return $ EBin Mod e1 e2
+
 padd = do
   whitespace
   e1 <- opa'
@@ -135,6 +145,7 @@ sIf = do
   s2 <- stmt `endBy` crlf
   whitespace
   string "wubalubadubdub"
+  whitespace
   return $ SIf e1 s1 s2
 
 sDec = do
@@ -155,6 +166,20 @@ sPrint = do
   whitespace
   return $ SPrint s
 
+sWhile = do
+  whitespace
+  string "while"
+  whitespace
+  e <- opb
+  whitespace
+  string "do this for grandpa"
+  whitespace
+  s <- stmt `endBy` crlf
+  whitespace
+  string "thanks Summer"
+  whitespace
+  return $ SWhile e s
+
 --GRAMMAR--
 
 --stmt -> if | while | dec
@@ -170,7 +195,7 @@ sPrint = do
 --opb' -> opa = opa | opa < opa | opa > opa | bterm
 --bterm -> True | False | (opb)
 
-stmt = try sIf <|> try sDec <|> try sPrint {-<|> try sWhile-} 
+stmt = try sIf <|> try sDec <|> try sPrint <|> try sWhile
 
 expr = try opb <|> try opa
 
@@ -178,7 +203,7 @@ expr = try opb <|> try opa
 
 opa = try padd <|> try psub <|> opa'
 
-opa' = try pmul <|> try pdiv <|> pterm
+opa' = try pmul <|> try pdiv <|> try pmod <|> pterm
 
 pterm = try base <|> try parenA <|> try pvar
   where base = pint
@@ -231,10 +256,10 @@ main :: IO String
 main = do
   file <- getContents
   --putStrLn file
-  {-case parseExp file of
+  case parseExp file of
     Left p -> return "error"
     Right e -> do
-      return $ concat $ map show e-}
-  let ((_,_),prt) = stepProg [] [] (parseExp file)
+      return $ concat $ map show e
+  --let ((_,_),prt) = stepProg [] [] (parseExp file)
   --let a = parseExp file
-  return $ concat prt
+  --return $ concat prt
