@@ -124,6 +124,10 @@ numGt = do
 --opa  -> opa' + opa | opa'  - opa | opa'
 --opa' -> pterm  * opa' | pterm `div` opa' | pterm
 --pterm -> base | (opa)
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/master
 --opb  -> opb' = opb | opb' and opb | opb' or opb | opb'
 --opb' -> opa = opa | opa < opa | opa > opa | bterm
 --bterm -> True | False | (opb)
@@ -170,6 +174,7 @@ bWrong = do
 parseExp :: String -> Either ParseError Exp
 parseExp src = parse (expr <* eof) "" src
 
+
 changeAssoc :: Exp -> Exp
 changeAssoc (EIntLit n) = (EIntLit n)
 changeAssoc (EBoolLit b) = (EBoolLit b)
@@ -207,10 +212,3 @@ changeAssoc (EIf cond e1 e2)= (EIf (changeAssoc cond)
                                   (changeAssoc e2))
 changeAssoc (EBin op e1 e2) = (EBin op (changeAssoc e1) (changeAssoc e2))
             
-            
-
-
---pbool -> int comp int | bool op pbool | bool
---cond  -> "if" pbool "then" opa "else" opa
-
-
