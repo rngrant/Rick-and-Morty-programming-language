@@ -5,6 +5,10 @@
   \providecommand{\doi}[1]{doi: #1}\else
   \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
 
+\bibitem[eso()]{esolang}
+Language list.
+\newblock URL \url{https://esolangs.org/wiki/language_list}.
+
 \bibitem[Clarke et~al.(1986)Clarke, Emerson, and Sistla]{AutomaticVerification}
 E.~M. Clarke, E.~A. Emerson, and A.~P. Sistla.
 \newblock Automatic verification of finite-state concurrent systems using
