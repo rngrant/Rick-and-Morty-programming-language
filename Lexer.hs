@@ -26,7 +26,8 @@ parenB = do
   whitespace
   return (EParens e)
 
-whitespace = void $ many $ oneOf " \n\t"
+whitespace = void $ many $ oneOf " \t\n"
+crlf = many $ oneOf "\n"
 
 pmul = do
   whitespace
@@ -47,6 +48,16 @@ pdiv = do
   e2 <- opa'
   whitespace
   return $ EBin Div e1 e2
+
+pmod = do
+  whitespace
+  e1 <- pterm
+  whitespace
+  string "mod"
+  whitespace
+  e2 <- opa'
+  whitespace
+  return $ EBin Mod e1 e2
 
 padd = do
   whitespace
@@ -117,20 +128,74 @@ numGt = do
   whitespace
   return $ EBin LessThan e1 e2
 
+--STATEMENTS--
+
+sIf = do
+  whitespace
+  string "if"
+  whitespace
+  e1 <- opb
+  whitespace
+  string "then"
+  whitespace
+  s1 <- stmt `endBy` crlf
+  whitespace
+  string "otherwise"
+  whitespace
+  s2 <- stmt `endBy` crlf
+  whitespace
+  string "wubalubadubdub"
+  whitespace
+  return $ SIf e1 s1 s2
+
+sDec = do
+  whitespace
+  s <- many1 letter
+  whitespace
+  string "means"
+  whitespace
+  e <- expr
+  whitespace
+  return $ SDecl s e
+
+sPrint = do
+  whitespace
+  string "show me"
+  whitespace
+  s <- many1 letter
+  whitespace
+  return $ SPrint s
+
+sWhile = do
+  whitespace
+  string "while"
+  whitespace
+  e <- opb
+  whitespace
+  string "do this for grandpa"
+  whitespace
+  s <- stmt `endBy` crlf
+  whitespace
+  string "thanks Summer"
+  whitespace
+  return $ SWhile e s
+
 --GRAMMAR--
+
+--stmt -> if | while | dec
+--if -> 'if' opb 'then' [stmt] 'otherwise' [stmt]
 
 --expr -> opa | opb
 
 --opa  -> opa' + opa | opa'  - opa | opa'
 --opa' -> pterm  * opa' | pterm `div` opa' | pterm
 --pterm -> base | (opa)
-<<<<<<< HEAD
-=======
 
->>>>>>> origin/master
 --opb  -> opb' = opb | opb' and opb | opb' or opb | opb'
 --opb' -> opa = opa | opa < opa | opa > opa | bterm
 --bterm -> True | False | (opb)
+
+stmt = try sIf <|> try sDec <|> try sPrint <|> try sWhile
 
 expr = try opb <|> try opa
 
@@ -138,9 +203,9 @@ expr = try opb <|> try opa
 
 opa = try padd <|> try psub <|> opa'
 
-opa' = try pmul <|> try pdiv <|> pterm
+opa' = try pmul <|> try pdiv <|> try pmod <|> pterm
 
-pterm = try base <|> try parenA  --term
+pterm = try base <|> try parenA <|> try pvar
   where base = pint
 
 pint :: Parser Exp
@@ -154,7 +219,7 @@ pint = do
 
 opb  = try band <|> try bor <|> opb'
 opb' = try numEq <|> try numLt <|> try numGt <|> bterm
-bterm = try base <|> try parenB
+bterm = try base <|> try parenB <|> try pvar
   where base = try bRight <|> try bWrong
 
 bRight :: Parser Exp
@@ -171,8 +236,18 @@ bWrong = do
   whitespace
   return $ EBoolLit False
 
-parseExp :: String -> Either ParseError Exp
-parseExp src = parse (expr <* eof) "" src
+--VARS--
+
+pvar :: Parser Exp
+pvar = do
+  whitespace
+  v <- many1 letter
+  whitespace
+  return $ EVar v
+
+parseExp :: String -> Either ParseError Prog
+parseExp src = parse (many1 stmt <* eof) "" src
+
 
 
 changeAssoc :: Exp -> Exp
@@ -212,3 +287,18 @@ changeAssoc (EIf cond e1 e2)= (EIf (changeAssoc cond)
                                   (changeAssoc e2))
 changeAssoc (EBin op e1 e2) = (EBin op (changeAssoc e1) (changeAssoc e2))
             
+--pbool -> int comp int | bool op pbool | bool
+--cond  -> "if" pbool "then" opa "else" opa
+
+main :: IO String
+main = do
+  file <- getContents
+  --putStrLn file
+  case parseExp file of
+    Left p -> return "error"
+    Right e -> do
+      return $ concat $ map show e
+  --let ((_,_),prt) = stepProg [] [] (parseExp file)
+  --let a = parseExp file
+  --return $ concat prt
+

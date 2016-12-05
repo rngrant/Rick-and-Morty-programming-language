@@ -20,10 +20,10 @@ data BOp where
   deriving (Eq)
 
 instance Show BOp where
-  show Add = "Plus"
-  show Sub = "Minus"
-  show Mul = "Times"
-  show Div = "DividedBy"
+  show Add = "Add"
+  show Sub = "Sub"
+  show Mul = "Mul"
+  show Div = "Div"
   show Mod = "Mod"
   show Equals = "Equals"
   show GreaterThan = "GreaterThan"
@@ -47,6 +47,7 @@ data Exp where
   EBin :: BOp -> Exp -> Exp -> Exp
   EIf :: Exp -> Exp -> Exp -> Exp
   EParens :: Exp -> Exp
+  EVar :: String -> Exp
   deriving (Eq, Show)
 
 
@@ -61,6 +62,17 @@ data Value where
   VInt :: Int -> Value
   VBool :: Bool -> Value
   deriving (Eq, Show)
+
+data Stmt where
+  SDecl :: String -> Exp -> Stmt
+  SWhile :: Exp -> [Stmt] -> Stmt
+  SIf :: Exp -> [Stmt] -> [Stmt] -> Stmt
+  SPrint :: String -> Stmt
+  deriving (Eq, Show)
+
+type Prog = [Stmt]
+type Env = [(String, Value)]
+type Print = [String]
 
 evalIntBOp :: (Int -> Int -> Int) -> (Maybe Value) -> (Maybe Value) -> (Maybe Value)
 evalIntBOp op v1 v2 = case (v1, v2) of
@@ -77,30 +89,32 @@ evalIntBoolBOp op v1 v2 = case (v1, v2) of
   (Just (VInt n1), Just (VInt n2)) -> Just $ VBool $ op n1 n2
   _ -> Nothing
 
-eval :: Exp -> Maybe Value
-eval (EIntLit n) = Just $ VInt n
-eval (EBoolLit b) = Just $ VBool b
-eval (EUOp Neg e) = case eval e of
+eval :: Env -> Exp -> Maybe Value
+eval env (EVar x) = lookup x env
+eval env (EIntLit n) = Just $ VInt n
+eval env (EBoolLit b) = Just $ VBool b
+eval env (EUOp Neg e) = case eval env e of
   Just (VInt n) -> Just $ VInt (-n)
   _ -> Nothing
-eval (EUOp Not e) = case eval e of
+eval env (EUOp Not e) = case eval env e of
   Just (VBool b) -> Just $ VBool $ not b
   _ -> Nothing
-eval (EBin Add e1 e2) = evalIntBOp (+) (eval e1) (eval e2)
-eval (EBin Sub e1 e2) = evalIntBOp (-) (eval e1) (eval e2)
-eval (EBin Mul e1 e2) = evalIntBOp (*) (eval e1) (eval e2)
-eval (EBin Div e1 e2) = evalIntBOp div (eval e1) (eval e2)
-eval (EBin Mod e1 e2) = evalIntBOp mod (eval e1) (eval e2)
-eval (EBin And e1 e2) = evalBoolBOp (&&) (eval e1) (eval e2)
-eval (EBin Or e1 e2) = evalBoolBOp (||) (eval e1) (eval e2)
-eval (EBin Equals e1 e2) = evalIntBoolBOp (==) (eval e1) (eval e2)
-eval (EBin LessThan e1 e2) = evalIntBoolBOp (<) (eval e1) (eval e2)
-eval (EBin GreaterThan e1 e2) = evalIntBoolBOp (>) (eval e1) (eval e2)
-eval (EIf cond e1 e2) = case eval cond of
-  Just (VBool True) -> eval e1
-  Just (VBool False) -> eval e2
+eval env (EBin Add e1 e2) = evalIntBOp (+) (eval env e1) (eval env e2)
+eval env (EBin Sub e1 e2) = evalIntBOp (-) (eval env e1) (eval env e2)
+eval env (EBin Mul e1 e2) = evalIntBOp (*) (eval env e1) (eval env e2)
+eval env (EBin Div e1 e2) = evalIntBOp div (eval env e1) (eval env e2)
+eval env (EBin Mod e1 e2) = evalIntBOp mod (eval env e1) (eval env e2)
+eval env (EBin And e1 e2) = evalBoolBOp (&&) (eval env e1) (eval env e2)
+eval env (EBin Or e1 e2) = evalBoolBOp (||) (eval env e1) (eval env e2)
+eval env (EBin Equals e1 e2) = evalIntBoolBOp (==) (eval env e1) (eval env e2)
+eval env (EBin LessThan e1 e2) = evalIntBoolBOp (<) (eval env e1) (eval env e2)
+eval env (EBin GreaterThan e1 e2) = evalIntBoolBOp (>) (eval env e1) (eval env e2)
+eval env (EIf cond e1 e2) = case eval env cond of
+  Just (VBool True) -> eval env e1
+  Just (VBool False) -> eval env e2
   _ -> Nothing
-eval (EParens e) = eval e
+eval env (EParens e) = eval env e
+
 
 data Typ where
   TInt :: Typ
@@ -141,11 +155,47 @@ typecheck (EIf c e1 e2) =
     Just TBool -> case (typecheck e1, typecheck e2) of
       (Just t1, Just t2) -> if t1 == t2 then Just t1 else Nothing
     _ -> Nothing
+--typecheck (SDecl _ e) = typecheck e
+
+
+printHelp :: Show a => a -> IO ()
+printHelp = print
 
 safeEval :: Either ParseError Exp -> Maybe Value
 safeEval (Right e) =
   case typecheck e of
-    Just _ -> eval e
+    Just _ -> eval [] e
     _      -> Nothing
 safeEval (Left e)= Nothing
 
+exec :: Env -> Print -> Stmt -> ((Env, [Stmt]), Print)
+exec env _ (SDecl s e) =
+  case eval env e of
+    Just val  ->
+      case lookup s env of
+        Just v  -> (((filter (\x -> fst x /= s) env) ++ [(s, val)], []),[]) 
+        Nothing -> (((env ++ [(s , val)]), []),[])
+    Nothing -> error "You really fucked it up here: Unable to evaluate passed expression"
+exec env _ (SWhile e s) =
+  case eval env e of
+    Just (VBool True) -> ((env, (s ++ [SWhile e s])),[])
+    Just (VBool False) -> ((env, []),[])
+    Nothing -> error "You really fucked it up here: Passed expression not resolved to boolean"
+exec env prt (SPrint s) =
+  case lookup s env of
+    Just v -> ((env, []), [show v])
+    Nothing -> error "You really fucked it up here: Variable not found"
+      
+exec env _ (SIf e s1 s2) =
+  case eval env e of
+    Just (VBool True)  -> ((env, s1),[])
+    Just (VBool False) -> ((env, s2),[])
+    _          -> error "You really fucked it up here: Unable to evaluate given boolean"
+
+
+stepProg :: Env -> Print -> Either ParseError Prog -> ((Env, Prog),Print)
+stepProg _  _(Left e) = error "Parse error"
+stepProg env prt (Right []) = ((env, []),prt)
+stepProg env prt (Right (s:prog)) =
+  let ((env', prog'), prt') = exec env prt s
+    in stepProg env' (prt ++ prt') (Right (prog' ++ prog))

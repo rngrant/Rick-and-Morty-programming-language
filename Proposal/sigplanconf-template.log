@@ -1,4 +1,10 @@
+<<<<<<< HEAD
 This is pdfTeX, Version 3.14159265-2.6-1.40.17 (MiKTeX 2.9) (preloaded format=pdflatex 2016.9.27)  14 OCT 2016 11:18
+=======
+
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  14 OCT 2016 01:10
+
+>>>>>>> master
 entering extended mode
 **./sigplanconf-template.tex
 (sigplanconf-template.tex
@@ -278,6 +284,24 @@ LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <18> not available
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <11> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 79.
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+
+Package natbib Warning: Citation `esolang' on page 1 undefined on input line 12
+5.
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [1{/usr/local/texlive/2015/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
+
+
+Non-PDF special ignored!
+
+] (./sigplanconf-template.bbl
+=======
+>>>>>>> master
 Overfull \hbox (12.0424pt too wide) in paragraph at lines 159--161
 \OT1/ptm/m/n/9 ments. This will al-low pro-gram-mers to prop-erly ver-ify non-t
 erminating
@@ -292,6 +316,10 @@ Underfull \vbox (badness 1466) has occurred while \output is active []
 Non-PDF special ignored!
 
 ]
+<<<<<<< HEAD
+=======
+>>>>>>> 0fb6435d1215529b5271ff9d1d804aee84ddd68e
+>>>>>>> master
 Missing character: There is no â in font ptmr7t!
 Missing character: There is no € in font ptmr7t!
 Missing character: There is no “ in font ptmr7t!
@@ -309,6 +337,49 @@ Missing character: There is no â in font ptmr7t!
 Missing character: There is no € in font ptmr7t!
 Missing character: There is no “ in font ptmr7t!
 )
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+
+Package natbib Warning: There were undefined citations.
+
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 211.
+[2
+
+]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 211.
+ (./sigplanconf-template.aux
+
+Package natbib Warning: Citation(s) may have changed.
+(natbib)                Rerun to get citations correct.
+
+)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 211.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 211.
+Package rerunfilecheck Info: File `sigplanconf-template.out' has not changed.
+(rerunfilecheck)             Checksum: A8EDEF5E1269A23AA74BCABF94B4DC5F;183.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 211.
+ ) 
+Here is how much of TeX's memory you used:
+ 5718 strings out of 493089
+ 83118 string characters out of 6134842
+ 181123 words of memory out of 5000000
+ 9158 multiletter control sequences out of 15000+600000
+ 21037 words of font info for 44 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 30i,5n,30p,244b,440s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/local/texlive/2015/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/t
+exlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmss9.pfb></usr/local/tex
+live/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb></usr/local/texli
+ve/2015/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2015/te
+xmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2015/texmf-dist/f
+onts/type1/urw/times/utmri8a.pfb>
+Output written on sigplanconf-template.pdf (2 pages, 70889 bytes).
+PDF statistics:
+ 90 PDF objects out of 1000 (max. 8388607)
+ 80 compressed objects within 1 object stream
+=======
+>>>>>>> master
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 208.
  [2
 
@@ -338,6 +409,10 @@ ts/type1/urw/times/utmri8a.pfb>
 Output written on sigplanconf-template.pdf (2 pages, 79947 bytes).
 PDF statistics:
  89 PDF objects out of 1000 (max. 8388607)
+<<<<<<< HEAD
+=======
+>>>>>>> 0fb6435d1215529b5271ff9d1d804aee84ddd68e
+>>>>>>> master
  24 named destinations out of 1000 (max. 500000)
  33 words of extra memory for PDF output out of 10000 (max. 10000000)
 
