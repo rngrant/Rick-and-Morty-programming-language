@@ -26,7 +26,7 @@ parenB = do
   whitespace
   return (EParens e)
 
-whitespace = void $ many $ oneOf " \t\n"
+whitespace = void $ many $ oneOf" \t\n"
 crlf = many $ oneOf "\n"
 
 pmul = do
@@ -248,6 +248,16 @@ pvar = do
 parseExp :: String -> Either ParseError Prog
 parseExp src = parse (many1 stmt <* eof) "" src
 
+changeAssocStmt :: Stmt -> Stmt
+changeAssocStmt (SDecl str e) =  (SDecl str (changeAssoc e))
+changeAssocStmt (SWhile e stmlist) =
+                (SWhile (changeAssoc e)
+                (map changeAssocStmt stmlist))
+changeAssocStmt (SIf e stmlist1 stmlist2) =
+                (SIf (changeAssoc e)
+                (map changeAssocStmt stmlist1)
+                (map changeAssocStmt stmlist2))
+changeAssocStmt (SPrint str) = (SPrint str)
 
 
 changeAssoc :: Exp -> Exp
