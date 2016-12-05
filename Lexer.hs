@@ -252,14 +252,14 @@ parseExp src = parse (many1 stmt <* eof) "" src
 --pbool -> int comp int | bool op pbool | bool
 --cond  -> "if" pbool "then" opa "else" opa
 
-main :: IO String
+main :: IO ()
 main = do
   file <- getContents
   --putStrLn file
-  case parseExp file of
+  {-case parseExp file of
     Left p -> return "error"
     Right e -> do
-      return $ concat $ map show e
-  --let ((_,_),prt) = stepProg [] [] (parseExp file)
+      return $ concat $ map show e-}
+  let ((_,_),prt) = stepProg [] [] (parseExp file)
   --let a = parseExp file
-  --return $ concat prt
+  putStr $ concat (map (++ "\n") prt)

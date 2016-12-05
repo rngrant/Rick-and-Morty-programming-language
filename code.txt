@@ -1,29 +1,29 @@
 i means 1
 
-while i is less than 100 do this for grandpa
+while i is less than 1000 do this for grandpa
 
-  j means 1
+  j means 2
 
-  while j is less than i do this for grandpa
+  notFound means right
 
-    notFound means True
+  while you gotta j is less than i and notFound Morty do this for grandpa
 
     if i mod j is the same as 0 then
-      notFound means False
+      notFound means wrong
     otherwise
-      notFound means True
+      notFound means right
     wubalubadubdub
 
-    j means j plus 1
+    j means 1 plus j
 
   thanks Summer
 
   if notFound then
-    print i
+    show me i
   otherwise
-    notFound means True
+    notFound means right
   wubalubadubdub
 
-  i means i plus 1
+  i means 1 plus i
 
 thanks Summer
