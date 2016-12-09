@@ -1,7 +1,7 @@
 module Lexer where
 
 import Control.Monad 
-import Text.Parsec
+import Text.Parsec hiding (crlf)
 import Text.Parsec.String
 import Control.Applicative ((<*))
 import CodeGen
@@ -247,6 +247,9 @@ pvar = do
 
 parseExp :: String -> Either ParseError Prog
 parseExp src = parse (many1 stmt <* eof) "" src
+
+testParseExp :: String -> Either ParseError Exp
+testParseExp src = parse (expr <* eof) "" src
 
 changeAssocStmt :: Stmt -> Stmt
 changeAssocStmt (SDecl str e) =  (SDecl str (changeAssoc e))
