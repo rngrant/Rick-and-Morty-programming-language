@@ -180,6 +180,31 @@ sWhile = do
   whitespace
   return $ SWhile e s
 
+
+sPortal = do
+  whitespace
+  string "lets grab our"
+  whitespace
+  u <- many1 letter
+  whitespace
+  string "and portal out of here"
+  whitespace
+  return $ SPortal u
+
+
+--UNIVERSE--
+uParse = do
+  whitespace
+  string "universe"
+  whitespace
+  s <- many1 letter
+  whitespace
+  b <- stmt `endBy` crlf
+  whitespace
+  string "destroy universe"
+  whitespace
+  return $ (s, b)
+
 --GRAMMAR--
 
 --stmt -> if | while | dec
@@ -195,7 +220,7 @@ sWhile = do
 --opb' -> opa = opa | opa < opa | opa > opa | bterm
 --bterm -> True | False | (opb)
 
-stmt = try sIf <|> try sDec <|> try sPrint <|> try sWhile
+stmt = try sPortal <|> try sIf <|> try sDec <|> try sPrint <|> try sWhile
 
 expr = try opb <|> try opa
 
@@ -245,21 +270,25 @@ pvar = do
   whitespace
   return $ EVar v
 
-parseExp :: String -> Either ParseError Prog
-parseExp src = parse (many1 stmt <* eof) "" src
-
+parseExp :: String -> Either ParseError Multi
+parseExp src = parse (many1 uParse <* eof) "" src
 
 --pbool -> int comp int | bool op pbool | bool
 --cond  -> "if" pbool "then" opa "else" opa
 
+
 main :: IO ()
 main = do
   file <- getContents
-  --putStrLn file
-  {-case parseExp file of
-    Left p -> return "error"
-    Right e -> do
-      return $ concat $ map show e-}
-  let ((_,_),prt) = stepProg [] [] (parseExp file)
-  --let a = parseExp file
+  let ((_,_),prt) = stepUni [] [] (parseExp file)
   putStr $ concat (map (++ "\n") prt)
+
+{-
+main :: IO String
+main = do
+  file <- getContents
+  case parseExp file of
+    Left p -> return $ show p
+    Right e -> do
+      return $ concat $ map show e
+-}

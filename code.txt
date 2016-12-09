@@ -1,29 +1,76 @@
-i means 1
+universe one
 
-while i is less than 1000 do this for grandpa
+numOne means 1
+numTwo means 2
+show me numOne
+show me numTwo
 
-  j means 2
+lets grab our two and portal out of here
 
-  notFound means right
+iOne means 3
 
-  while you gotta j is less than i and notFound Morty do this for grandpa
+while iOne is less than 1000 do this for grandpa
 
-    if i mod j is the same as 0 then
-      notFound means wrong
+  jOne means 3
+
+  notFoundOne means right
+
+  while jOne is less than iOne and notFoundOne do this for grandpa
+
+    if iOne mod jOne is the same as 0 then
+      notFoundOne means wrong
     otherwise
-      notFound means right
+      notFoundOne means right
     wubalubadubdub
 
-    j means 1 plus j
+    jOne means 2 plus jOne
 
   thanks Summer
 
-  if notFound then
-    show me i
+  if notFoundOne then
+    show me iOne
   otherwise
-    notFound means right
+    notFoundOne means right
   wubalubadubdub
 
-  i means 1 plus i
+  iOne means 4 plus iOne
 
 thanks Summer
+
+destroy universe
+
+
+
+universe two
+
+iTwo means 5
+
+while iTwo is less than 1000 do this for grandpa
+
+  jTwo means 3
+
+  notFoundTwo means right
+
+  while jTwo is less than iTwo and notFoundTwo do this for grandpa
+
+    if iTwo mod jTwo is the same as 0 then
+      notFoundTwo means wrong
+    otherwise
+      notFoundTwo means right
+    wubalubadubdub
+
+    jTwo means 2 plus jTwo
+
+  thanks Summer
+
+  if notFoundTwo then
+    show me iTwo
+  otherwise
+    notFoundTwo means right
+  wubalubadubdub
+
+  iTwo means 4 plus iTwo
+
+thanks Summer
+
+destroy universe
