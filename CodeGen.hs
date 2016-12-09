@@ -202,24 +202,18 @@ exec m env _ (SPortal u) =
     _ -> error "You really fucked it up here: Universe not found"
 
 
-stepProg :: Multi -> Env -> Print -> Either ParseError Prog -> ((Env, Prog), Print)
-stepProg _ _  _(Left e) = error "Parse error"
-stepProg _ env prt (Right []) = ((env, []),prt)
-stepProg m env prt (Right ((SPortal u):prog)) =
+stepProg :: Multi -> Env -> Print -> [Prog] -> ((Env, Prog), Print)
+stepProg _ env prt [] = ((env, []),prt)
+stepProg m env prt (((SPortal u):prog):xs) =
   let ((_, prog'), _) = exec m env prt (SPortal u)
-    in stepProg m env prt (Right (merge prog' prog))
-stepProg m env prt (Right (s:prog)) =
+    in stepProg m env prt (xs ++ ([prog'] ++ [prog]))
+stepProg m env prt (([]):xs) = stepProg m env prt xs
+stepProg m env prt ((s:prog):xs) =
   let ((env', prog'), prt') = exec m env prt s
-    in stepProg m env' (prt ++ prt') (Right (prog ++ prog'))
+    in stepProg m env' (prt ++ prt') (xs ++ ([prog' ++ prog]))
 
 stepUni :: Env -> Print -> Either ParseError Multi -> ((Env, Prog), Print)
 stepUni _ _ (Left e) = error "Universe Parse error"
 stepUni env prt (Right []) = error "You have destroyed the multiverse"
-stepUni env prt (Right (s:block)) = stepProg (s:block) env prt (Right (snd s))
-
---http://stackoverflow.com/questions/3938438/merging-two-lists-in-haskell
-merge :: [a] -> [a] -> [a]
-merge xs     []     = xs
-merge []     ys     = ys
-merge (x:xs) (y:ys) = x : y : merge xs ys
+stepUni env prt (Right (s:block)) = stepProg (s:block) env prt [(snd s)]
 

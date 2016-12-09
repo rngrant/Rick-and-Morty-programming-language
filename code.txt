@@ -5,6 +5,10 @@ numTwo means 2
 show me numOne
 show me numTwo
 
+uTwoNotDone means right
+
+sum means 3
+
 lets grab our two and portal out of here
 
 iOne means 3
@@ -29,6 +33,7 @@ while iOne is less than 1000 do this for grandpa
 
   if notFoundOne then
     show me iOne
+    sum means sum plus iOne
   otherwise
     notFoundOne means right
   wubalubadubdub
@@ -36,6 +41,12 @@ while iOne is less than 1000 do this for grandpa
   iOne means 4 plus iOne
 
 thanks Summer
+
+while uTwoNotDone do this for grandpa
+  doNothing means 0
+thanks Summer
+
+show me sum
 
 destroy universe
 
@@ -65,6 +76,7 @@ while iTwo is less than 1000 do this for grandpa
 
   if notFoundTwo then
     show me iTwo
+    sum means sum plus iTwo
   otherwise
     notFoundTwo means right
   wubalubadubdub
@@ -72,5 +84,7 @@ while iTwo is less than 1000 do this for grandpa
   iTwo means 4 plus iTwo
 
 thanks Summer
+
+uTwoNotDone means wrong
 
 destroy universe
