@@ -52,35 +52,36 @@
 \titlebanner{banner above paper title}        % These are ignored unless
 \preprintfooter{short description of paper}   % 'preprint' option specified.
 
-\title{Title Text}
-\subtitle{Subtitle Text, if any}
+\title{An Esoteric Programming Language to Simulate Parallel Computing}
+\subtitle{Contact: [email]@grinnell.edu}
 
-\authorinfo{Name1}
-           {Affiliation1}
-           {Email1}
-\authorinfo{Name2\and Name3}
-           {Affiliation2/3}
-           {Email2/3}
+\authorinfo{Reilly Grant}
+           {Grinnell College}
+           {[grantrei]}
+\authorinfo{Tristan Knoth}
+           {Grinnell College}
+           {[knothtri17]}
+\authorinfo{Chris Kottke}
+           {Grinnell College}
+           {[kottkech17]}
 
 \maketitle
 
 \begin{abstract}
-This is the text of the abstract.
+Parallel computing is an important way to process over very large problems. However, developing parallel applications is extremely difficult. We develop Generalized Rick And Morty ProgrAmming (GRAMPA), an esoteric imperative programming language supporting a simple forking model in order to simulate parallelism and introduce students shared memory and other rudimentary parallel computing concepts. The language supports only a limited set of commands, and includes syntax is based on the popular cartoon Rick and Morty in order to present parallel computing concepts in a fun and accessible manner.
 \end{abstract}
-
-\category{CR-number}{subcategory}{third-level}
-
-% general terms are not compulsory anymore,
-% you may leave them out
-\terms
-term1, term2
-
-\keywords
-keyword1, keyword2
 
 \section{Introduction}
 
-The text of the paper begins here.
+As parallelism becomes the most important paradigm for large-scale information processing, developing parallel applications is becoming an increasingly important skill for any developer. Students who begin to think about splitting problems up between processors earlier in their computer science education will potentially see more success learning more sophisticated parallelism paradigms later on. To this end, the popular TV show Rick and Morty presents the perfect medium through which to introduce students to rudimentary parallelism concepts. We develop GRAMPA, a simple Turing Complete imperative language with syntax based on references to Rick and Morty that supports a simple model of forking across shared memory. In Rick and Morty, the main characters travel between dimensions. The show's clear conceptual connections to multithreading may help alleviate the pain of learning to parallelize simple algorithms. 
+
+\section{Prior Work}
+
+GRAMPA relies on a number of existing technologies, particularly the Haskell Parsec library. 
+
+\section{GRAMPA Basics}
+
+\section{Parallelism in GRAMPA}
 
 \appendix
 \section{Appendix Title}
