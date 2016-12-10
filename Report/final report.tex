@@ -29,7 +29,8 @@
 % 11pt          To set in 11-point type instead of 9-point.
 % numbers       To obtain numeric citation style instead of author/year.
 
-\usepackage{amsmath}
+\usepackage{amsmath, amssymb, float, caption}
+\usepackage[ruled,vlined]{algorithm2e}
 
 \newcommand{\cL}{{\cal L}}
 
@@ -43,6 +44,7 @@
 \copyrightyear{20yy}
 \copyrightdata{978-1-nnnn-nnnn-n/yy/mm}
 \copyrightdoi{nnnnnnn.nnnnnnn}
+\allowdisplaybreaks
 
 % Uncomment the publication rights you want to use.
 %\publicationrights{transferred}
@@ -52,7 +54,7 @@
 \titlebanner{banner above paper title}        % These are ignored unless
 \preprintfooter{short description of paper}   % 'preprint' option specified.
 
-\title{An Esoteric Programming Language to Simulate Parallel Computing}
+\title{GRAMPA: An Esoteric Programming Language to Simulate Parallel Computing}
 \subtitle{Contact: [email]@grinnell.edu}
 
 \authorinfo{Reilly Grant}
@@ -73,13 +75,66 @@ Parallel computing is an important way to process over very large problems. Howe
 
 \section{Introduction}
 
-As parallelism becomes the most important paradigm for large-scale information processing, developing parallel applications is becoming an increasingly important skill for any developer. Students who begin to think about splitting problems up between processors earlier in their computer science education will potentially see more success learning more sophisticated parallelism paradigms later on. To this end, the popular TV show Rick and Morty presents the perfect medium through which to introduce students to rudimentary parallelism concepts. We develop GRAMPA, a simple Turing Complete imperative language with syntax based on references to Rick and Morty that supports a simple model of forking across shared memory. In Rick and Morty, the main characters travel between dimensions. The show's clear conceptual connections to multithreading may help alleviate the pain of learning to parallelize simple algorithms. 
+As parallelism becomes the most important paradigm for large-scale information processing, developing parallel applications is becoming an increasingly important skill for any developer. Students who begin to think about splitting problems up between processors earlier in their computer science education will potentially see more success learning more sophisticated parallelism paradigms later on. To this end, the popular TV show Rick and Morty presents the perfect medium through which to introduce students to rudimentary parallelism concepts. We develop GRAMPA, a simple Turing Complete imperative language with syntax based on references to Rick and Morty that supports a simple model of forking across shared memory. In Rick and Morty, the main characters travel between dimensions. The show's clear conceptual connections to multithreading may help alleviate the pain of learning to parallelize simple algorithms. GRAMPA's syntax is intended to look something like written natural language.
 
 \section{Prior Work}
 
-GRAMPA relies on a number of existing technologies, particularly the Haskell Parsec library. 
+GRAMPA relies on a number of existing technologies, particularly the Haskell Parsec library. Our parser is built in Haskell using Parsec, which allows users to combine parsers via monads.... Didn't really know what else to put in this section.
 
-\section{GRAMPA Basics}
+\section{Parsing GRAMPA}
+
+Using Parsec, we can build a recursive descent parser for GRAMPA by combining parsers for different types of expressions and statements in our language. Given a grammar for our language, we can define parsers for each variable in the grammar and thus recursively parse the entire language.
+
+\subsection*{Grammar}
+The following Context-Free Grammar defines the GRAMPA syntax, and indicates the parsing hierarchy. The variable STRING refers to any string consisting only of chars, and INT refers to any integer.
+\begin{align*}
+	S &\rightarrow UNIV \\
+	UNIV &\rightarrow \text{universe } STRING \; STMT \text{ destroy universe } \mid UNIV \; UNIV \\
+	STMT &\rightarrow PORTAL \mid IF \mid DECL \mid PRINT \mid WHILE \mid STMT \; STMT \\
+	EXPR &\rightarrow OP1 \\
+	OP1 &\rightarrow AND \mid OR \mid OP2 \\
+	OP2 &\rightarrow NUMEQ \mid NUMLT \mid NUMGT \mid OP3 \\
+	OP3 &\rightarrow ADD \mid SUB \mid OP4 \\
+	OP4 &\rightarrow MUL \mid DIV \mid MOD \mid TERM \\
+	TERM &\rightarrow BASE \mid PARENA \mid PARENB \mid STRING \\
+	BASE &\rightarrow INT \mid BOOL \\
+	BOOL &\rightarrow \text{right} \mid \text{wrong} \\
+	PORTAL &\rightarrow \text{lets grab our } STRING \text{ and portal out of here}\\
+	IF &\rightarrow \text{if } OP1 \text{ then } STMT \text{ otherwise } STMT \text{ wubulubadubdub}\\
+	DECL &\rightarrow STRING \text{ means } EXPR\\
+	PRINT &\rightarrow \text{show me } STRING\\
+	WHILE &\rightarrow \text{while } OP1 \text{ do this for grandpa } STMT \text{ thanks Summer}\\
+	AND &\rightarrow OP2 \text{ and } OP1\\
+	OR &\rightarrow OP2 \text{ or } OP1\\
+	NUMEQ &\rightarrow OP3 \text{ is the same as } OP3 \\
+	NUMLT &\rightarrow OP3 \text{ is less than } OP3\\
+	NUMGT &\rightarrow OP3 \text{ is greater than } OP3\\
+	ADD &\rightarrow OP4 \text{ plus } OP3\\
+	SUB &\rightarrow OP4 \text{ minus } OP3\\
+	MUL &\rightarrow TERM \text{ times } OP4\\
+	DIV &\rightarrow TERM \text{ divided by } OP4\\
+	MOD &\rightarrow TERM \text{ mod } OP4\\
+	PARENA &\rightarrow \text{you gotta } OP3 \text{ Morty}\\
+	PARENB &\rightarrow \text{you gotta } OP1 \text{ Morty}\\
+\end{align*}
+
+Given the context-free grammar above, we define parsers for each of the individual substitution rules. For example, to parse a multiplication, we look for a $TERM$ on the left side of the expression, a "times" to indicate that we are multiplying two expressions, and an $OP4$ on the right hand side of the expression. In Haskell, this is implemented as follows:
+
+\begin{algorithm}
+	\texttt{whitespace} \\
+	\texttt{e1} $\leftarrow$ \texttt{termParser}\\
+	\texttt{whitespace} \\
+	\texttt{string} "times" \\
+	\texttt{whitespace} \\
+	\texttt{e2} $\leftarrow$ \texttt{op4Parser} \\
+	\texttt{whitespace} \\
+	\texttt{return} \$ EBin Mul e1 e2  \\
+	\caption{Multiplication Parser}
+\end{algorithm}
+
+The sequence of instructions above is wrapped in a "do" block to create a parser for multiplication. \texttt{whitespace} is a parser designed to consume all whitespace. As such, our language is completely whitespace insensitive as long as one separates commands by any amount of whitespace. \texttt{string} is a parser built into Parsec, which parses a specific string. In this way, we combine parsers for different types of expressions and recursively parse the entire document. 
+
+Parsec also gives the user the option to "try" a parser. 
 
 \section{Parallelism in GRAMPA}
 
