@@ -1,5 +1,7 @@
 {-# LANGUAGE GADTs #-}
 
+{-Base code provide by Charlie Curtsinger-}
+
 module CodeGen where
 
 import Text.Parsec
@@ -68,10 +70,13 @@ data Stmt where
   SWhile :: Exp -> [Stmt] -> Stmt
   SIf :: Exp -> [Stmt] -> [Stmt] -> Stmt
   SPrint :: String -> Stmt
+  SPortal :: String -> Stmt
   deriving (Eq, Show)
 
 type Prog = [Stmt]
 type Env = [(String, Value)]
+type Block = (String, Prog)
+type Multi = [Block]
 type Print = [String]
 
 evalIntBOp :: (Int -> Int -> Int) -> (Maybe Value) -> (Maybe Value) -> (Maybe Value)
@@ -168,34 +173,47 @@ safeEval (Right e) =
     _      -> Nothing
 safeEval (Left e)= Nothing
 
-exec :: Env -> Print -> Stmt -> ((Env, [Stmt]), Print)
-exec env _ (SDecl s e) =
+exec :: Multi -> Env -> Print -> Stmt -> ((Env, [Stmt]), Print)
+exec _ env _ (SDecl s e) =
   case eval env e of
     Just val  ->
       case lookup s env of
         Just v  -> (((filter (\x -> fst x /= s) env) ++ [(s, val)], []),[]) 
         Nothing -> (((env ++ [(s , val)]), []),[])
     Nothing -> error "You really fucked it up here: Unable to evaluate passed expression"
-exec env _ (SWhile e s) =
+exec _ env _ (SWhile e s) =
   case eval env e of
     Just (VBool True) -> ((env, (s ++ [SWhile e s])),[])
     Just (VBool False) -> ((env, []),[])
     Nothing -> error "You really fucked it up here: Passed expression not resolved to boolean"
-exec env prt (SPrint s) =
+exec _ env prt (SPrint s) =
   case lookup s env of
     Just v -> ((env, []), [show v])
     Nothing -> error "You really fucked it up here: Variable not found"
       
-exec env _ (SIf e s1 s2) =
+exec _ env _ (SIf e s1 s2) =
   case eval env e of
     Just (VBool True)  -> ((env, s1),[])
     Just (VBool False) -> ((env, s2),[])
     _          -> error "You really fucked it up here: Unable to evaluate given boolean"
+exec m env _ (SPortal u) =
+  case lookup u m of
+    Just p -> ((env, p), [])
+    _ -> error "You really fucked it up here: Universe not found"
 
 
-stepProg :: Env -> Print -> Either ParseError Prog -> ((Env, Prog),Print)
-stepProg _  _(Left e) = error "Parse error"
-stepProg env prt (Right []) = ((env, []),prt)
-stepProg env prt (Right (s:prog)) =
-  let ((env', prog'), prt') = exec env prt s
-    in stepProg env' (prt ++ prt') (Right (prog' ++ prog))
+stepProg :: Multi -> Env -> Print -> [Prog] -> ((Env, Prog), Print)
+stepProg _ env prt [] = ((env, []),prt)
+stepProg m env prt (((SPortal u):prog):xs) =
+  let ((_, prog'), _) = exec m env prt (SPortal u)
+    in stepProg m env prt (xs ++ ([prog'] ++ [prog]))
+stepProg m env prt (([]):xs) = stepProg m env prt xs
+stepProg m env prt ((s:prog):xs) =
+  let ((env', prog'), prt') = exec m env prt s
+    in stepProg m env' (prt ++ prt') (xs ++ ([prog' ++ prog]))
+
+stepUni :: Env -> Print -> Either ParseError Multi -> ((Env, Prog), Print)
+stepUni _ _ (Left e) = error "Universe Parse error"
+stepUni env prt (Right []) = error "You have destroyed the multiverse"
+stepUni env prt (Right (s:block)) = stepProg (s:block) env prt [(snd s)]
+
