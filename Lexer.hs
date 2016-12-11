@@ -281,11 +281,13 @@ testParseExp :: String -> Either ParseError Exp
 testParseExp src = parse (expr <* eof) "" src
 -}
 
+-- maps changing association over the multiverse.
 changeAssocMulti :: Multi -> Multi
 changeAssocMulti [] = []
 changeAssocMulti ((str,progs):ms) =
                  ((str,fmap changeAssocStmt progs):changeAssocMulti ms)
 
+-- maps changing association over statements
 changeAssocStmt :: Stmt -> Stmt
 changeAssocStmt (SDecl str e) =  (SDecl str (changeAssoc e))
 changeAssocStmt (SWhile e stmlist) =
@@ -298,7 +300,8 @@ changeAssocStmt (SIf e stmlist1 stmlist2) =
 changeAssocStmt (SPrint str)  = (SPrint str)
 changeAssocStmt (SPortal str) = (SPortal str)
 
-
+-- Changes an Expresion that is right associative
+-- into one which is left associative
 changeAssoc :: Exp -> Exp
 changeAssoc (EIntLit n) = (EIntLit n)
 changeAssoc (EBoolLit b) = (EBoolLit b)
