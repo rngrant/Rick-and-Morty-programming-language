@@ -273,10 +273,18 @@ pvar = do
 
 
 parseExp :: String -> Either ParseError Multi
-parseExp src = parse (many1 uParse <* eof) "" src
+parseExp src = fmap changeAssocMulti (parse (many1 uParse <* eof) "" src)
 
+-- Code for testing parsed expresions
+{-
 testParseExp :: String -> Either ParseError Exp
 testParseExp src = parse (expr <* eof) "" src
+-}
+
+changeAssocMulti :: Multi -> Multi
+changeAssocMulti [] = []
+changeAssocMulti ((str,progs):ms) =
+                 ((str,fmap changeAssocStmt progs):changeAssocMulti ms)
 
 changeAssocStmt :: Stmt -> Stmt
 changeAssocStmt (SDecl str e) =  (SDecl str (changeAssoc e))
