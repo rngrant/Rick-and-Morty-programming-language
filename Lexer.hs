@@ -1,140 +1,157 @@
 module Lexer where
 
 import Control.Monad 
-import Text.Parsec
+import Text.Parsec hiding (crlf)
 import Text.Parsec.String
 import Control.Applicative ((<*))
 import CodeGen
+import Debug.Trace
 
+--Parses arithmetic operations within parentheses
 parenA = do
   whitespace
   void $ string "you gotta"
   whitespace
-  e <- opa
+  e <- op3
   whitespace
   void $ string "Morty"
   whitespace
   return (EParens e)
 
+--Parses boolean operation within parentheses
 parenB = do
   whitespace
   void $ string "you gotta"
   whitespace
-  e <- opb
+  e <- op1
   whitespace
   void $ string "Morty"
   whitespace
   return (EParens e)
 
+--Clears whitespace
 whitespace = void $ many $ oneOf" \t\n"
+
+--Clears newlines
 crlf = many $ oneOf "\n"
 
+--Parses multiplication
 pmul = do
   whitespace
   e1 <- pterm
   whitespace
   string "times"
   whitespace
-  e2 <- opa'
+  e2 <- op4
   whitespace
   return $ EBin Mul e1 e2
 
+--Parses division
 pdiv = do
   whitespace
   e1 <- pterm
   whitespace
   string "divided by"
   whitespace
-  e2 <- opa'
+  e2 <- op4
   whitespace
   return $ EBin Div e1 e2
 
+--Parses modulo
 pmod = do
   whitespace
   e1 <- pterm
   whitespace
   string "mod"
   whitespace
-  e2 <- opa'
+  e2 <- op4
   whitespace
   return $ EBin Mod e1 e2
 
+--Parses addition
 padd = do
   whitespace
-  e1 <- opa'
+  e1 <- op4
   whitespace
   string "plus"
   whitespace
-  e2 <- opa
+  e2 <- op3
   whitespace
   return $ EBin Add e1 e2
 
+--Parses subtraction
 psub = do
   whitespace
-  e1 <- opa'
+  e1 <- op4
   whitespace
   string "minus"
   whitespace
-  e2 <- opa
+  e2 <- op3
   whitespace
   return $ EBin Sub e1 e2
 
 --BOOLEAN OPERATOR PARSER--
 
+--Parses and
 band = do
   whitespace
-  e1 <- opb'
+  e1 <- op2
   whitespace
   string "and"
   whitespace
-  e2 <- opb
+  e2 <- op1
   whitespace
   return $ EBin And e1 e2
 
+--Parses or
 bor = do
   whitespace
-  e1 <- opb'
+  e1 <- op2
   whitespace
   string "or"
   whitespace
-  e2 <- opb
+  e2 <- op1
   whitespace
   return $ EBin Or e1 e2
 
+--Parses numeric equality
 numEq = do
   whitespace
-  e1 <- opa
+  e1 <- op3
   whitespace
   string "is the same as"
-  e2 <- opa
+  e2 <- op3
   whitespace
   return $ EBin Equals e1 e2
 
+--Parses numeric less than
 numLt = do
   whitespace
-  e1 <- opa
+  e1 <- op3
   whitespace
   string "is less than"
-  e2 <- opa
+  e2 <- op3
   whitespace
   return $ EBin LessThan e1 e2
 
+--Parses numeric greater than
 numGt = do
   whitespace
-  e1 <- opa
+  e1 <- op3
   whitespace
   string "is greater than"
-  e2 <- opa
+  e2 <- op3
   whitespace
   return $ EBin LessThan e1 e2
 
 --STATEMENTS--
 
+--Parses if statements
 sIf = do
   whitespace
   string "if"
   whitespace
-  e1 <- opb
+  e1 <- op1
   whitespace
   string "then"
   whitespace
@@ -148,6 +165,7 @@ sIf = do
   whitespace
   return $ SIf e1 s1 s2
 
+--Parses variable declaration
 sDec = do
   whitespace
   s <- many1 letter
@@ -158,6 +176,7 @@ sDec = do
   whitespace
   return $ SDecl s e
 
+--Parses print statements
 sPrint = do
   whitespace
   string "show me"
@@ -166,11 +185,12 @@ sPrint = do
   whitespace
   return $ SPrint s
 
+--Parses while statements
 sWhile = do
   whitespace
   string "while"
   whitespace
-  e <- opb
+  e <- op1
   whitespace
   string "do this for grandpa"
   whitespace
@@ -180,33 +200,61 @@ sWhile = do
   whitespace
   return $ SWhile e s
 
+--Parses portal statements for multithreaded jumps
+sPortal = do
+  whitespace
+  string "lets grab our"
+  whitespace
+  u <- many1 letter
+  whitespace
+  string "and portal out of here"
+  whitespace
+  return $ SPortal u
+
+
+--UNIVERSE--
+
+--Parses a single universe (ie. a list of statements between a universe declaration and "destroy universe"
+uParse = do
+  whitespace
+  string "universe"
+  whitespace
+  s <- many1 letter
+  whitespace
+  b <- stmt `endBy` crlf
+  whitespace
+  string "destroy universe"
+  whitespace
+  return $ (s, b)
+
 --GRAMMAR--
 
---stmt -> if | while | dec
+--multi -> [univ]
+--univ -> [stmt]
+--stmt -> if | while | dec | portal | print
 --if -> 'if' opb 'then' [stmt] 'otherwise' [stmt]
 
---expr -> opa | opb
+--expr -> op1
 
---opa  -> opa' + opa | opa'  - opa | opa'
---opa' -> pterm  * opa' | pterm `div` opa' | pterm
---pterm -> base | (opa)
+--op1  -> op2 and op1 | op2 or op1  | op2
+--op2  -> op3 == op2  | op3 < op2   | op3 > op2  | op3
+--op3  -> op4 + op3   | op4 - op3   | op4
+--op4  -> pterm * op4 | pterm / op4 | pterm mod op4 | pterm
+--pterm -> base | parenA | parenB | pvar
+--base -> pint | bRight | bWrong
 
---opb  -> opb' = opb | opb' and opb | opb' or opb | opb'
---opb' -> opa = opa | opa < opa | opa > opa | bterm
---bterm -> True | False | (opb)
+stmt = try sPortal <|> try sIf <|> try sDec <|> try sPrint <|> try sWhile
 
-stmt = try sIf <|> try sDec <|> try sPrint <|> try sWhile
-
-expr = try opb <|> try opa
+expr = try op1
 
 --NUMBER OPS--
 
-opa = try padd <|> try psub <|> opa'
-
-opa' = try pmul <|> try pdiv <|> try pmod <|> pterm
-
-pterm = try base <|> try parenA <|> try pvar
-  where base = pint
+op1 = try band <|> try bor <|> op2
+op2 = try numEq <|> try numLt <|> try numGt <|> op3
+op3 = try padd <|> try psub <|> op4
+op4 = try pmul <|> try pdiv <|> try pmod  <|> pterm
+pterm = try base <|> try parenA <|> try parenB <|> try pvar
+  where base = pint <|> try bRight <|> try bWrong
 
 pint :: Parser Exp
 pint = do
@@ -216,11 +264,6 @@ pint = do
   return $ EIntLit (read n)
 
 --BOOL OPS--
-
-opb  = try band <|> try bor <|> opb'
-opb' = try numEq <|> try numLt <|> try numGt <|> bterm
-bterm = try base <|> try parenB <|> try pvar
-  where base = try bRight <|> try bWrong
 
 bRight :: Parser Exp
 bRight = do
@@ -245,9 +288,23 @@ pvar = do
   whitespace
   return $ EVar v
 
-parseExp :: String -> Either ParseError Prog
-parseExp src = parse (many1 stmt <* eof) "" src
+--Calls parse on src expecting at least one univ term
+parseExp :: String -> Either ParseError Multi
+parseExp src = fmap changeAssocMulti (parse (many1 uParse <* eof) "" src)
 
+-- Code for testing parsed expresions
+{-
+testParseExp :: String -> Either ParseError Exp
+testParseExp src = parse (expr <* eof) "" src
+-}
+
+-- maps changing association over the multiverse.
+changeAssocMulti :: Multi -> Multi
+changeAssocMulti [] = []
+changeAssocMulti ((str,progs):ms) =
+                 ((str,fmap changeAssocStmt progs):changeAssocMulti ms)
+
+-- maps changing association over statements
 changeAssocStmt :: Stmt -> Stmt
 changeAssocStmt (SDecl str e) =  (SDecl str (changeAssoc e))
 changeAssocStmt (SWhile e stmlist) =
@@ -257,9 +314,11 @@ changeAssocStmt (SIf e stmlist1 stmlist2) =
                 (SIf (changeAssoc e)
                 (map changeAssocStmt stmlist1)
                 (map changeAssocStmt stmlist2))
-changeAssocStmt (SPrint str) = (SPrint str)
+changeAssocStmt (SPrint str)  = (SPrint str)
+changeAssocStmt (SPortal str) = (SPortal str)
 
-
+-- Changes an Expresion that is right associative
+-- into one which is left associative
 changeAssoc :: Exp -> Exp
 changeAssoc (EIntLit n) = (EIntLit n)
 changeAssoc (EBoolLit b) = (EBoolLit b)
@@ -295,20 +354,23 @@ changeAssoc (EBin Mod e1 (EBin Mod e2 e3)) =
 changeAssoc (EIf cond e1 e2)= (EIf (changeAssoc cond)
                                   (changeAssoc e1)
                                   (changeAssoc e2))
+changeAssoc (EVar str)     =  (EVar str)                               
 changeAssoc (EBin op e1 e2) = (EBin op (changeAssoc e1) (changeAssoc e2))
-            
---pbool -> int comp int | bool op pbool | bool
---cond  -> "if" pbool "then" opa "else" opa
 
+--RUN FUNCTION: takes the text of an input file, parses, and runs stepUni on the output parse tree
+main :: IO ()
+main = do
+  file <- getContents
+  let ((_,_),prt) = stepUni [] [] (parseExp file)
+  putStr $ concat (map (++ "\n") prt)
+
+--DEBUG FUNCTION: Returns parse tree of given input file
+{-
 main :: IO String
 main = do
   file <- getContents
-  --putStrLn file
   case parseExp file of
-    Left p -> return "error"
+    Left p -> return $ show p
     Right e -> do
       return $ concat $ map show e
-  --let ((_,_),prt) = stepProg [] [] (parseExp file)
-  --let a = parseExp file
-  --return $ concat prt
-
+-}
