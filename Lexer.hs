@@ -290,11 +290,21 @@ pvar = do
 
 --Calls parse on src expecting at least one univ term
 parseExp :: String -> Either ParseError Multi
-parseExp src = parse (many1 uParse <* eof) "" src
+parseExp src = fmap changeAssocMulti (parse (many1 uParse <* eof) "" src)
 
+-- Code for testing parsed expresions
+{-
 testParseExp :: String -> Either ParseError Exp
 testParseExp src = parse (expr <* eof) "" src
+-}
 
+-- maps changing association over the multiverse.
+changeAssocMulti :: Multi -> Multi
+changeAssocMulti [] = []
+changeAssocMulti ((str,progs):ms) =
+                 ((str,fmap changeAssocStmt progs):changeAssocMulti ms)
+
+-- maps changing association over statements
 changeAssocStmt :: Stmt -> Stmt
 changeAssocStmt (SDecl str e) =  (SDecl str (changeAssoc e))
 changeAssocStmt (SWhile e stmlist) =
@@ -304,9 +314,11 @@ changeAssocStmt (SIf e stmlist1 stmlist2) =
                 (SIf (changeAssoc e)
                 (map changeAssocStmt stmlist1)
                 (map changeAssocStmt stmlist2))
-changeAssocStmt (SPrint str) = (SPrint str)
+changeAssocStmt (SPrint str)  = (SPrint str)
+changeAssocStmt (SPortal str) = (SPortal str)
 
-
+-- Changes an Expresion that is right associative
+-- into one which is left associative
 changeAssoc :: Exp -> Exp
 changeAssoc (EIntLit n) = (EIntLit n)
 changeAssoc (EBoolLit b) = (EBoolLit b)
@@ -342,6 +354,7 @@ changeAssoc (EBin Mod e1 (EBin Mod e2 e3)) =
 changeAssoc (EIf cond e1 e2)= (EIf (changeAssoc cond)
                                   (changeAssoc e1)
                                   (changeAssoc e2))
+changeAssoc (EVar str)     =  (EVar str)                               
 changeAssoc (EBin op e1 e2) = (EBin op (changeAssoc e1) (changeAssoc e2))
 
 --RUN FUNCTION: takes the text of an input file, parses, and runs stepUni on the output parse tree
