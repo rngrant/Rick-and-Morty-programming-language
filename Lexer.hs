@@ -295,7 +295,8 @@ changeAssocStmt (SIf e stmlist1 stmlist2) =
                 (SIf (changeAssoc e)
                 (map changeAssocStmt stmlist1)
                 (map changeAssocStmt stmlist2))
-changeAssocStmt (SPrint str) = (SPrint str)
+changeAssocStmt (SPrint str)  = (SPrint str)
+changeAssocStmt (SPortal str) = (SPortal str)
 
 
 changeAssoc :: Exp -> Exp
@@ -333,6 +334,7 @@ changeAssoc (EBin Mod e1 (EBin Mod e2 e3)) =
 changeAssoc (EIf cond e1 e2)= (EIf (changeAssoc cond)
                                   (changeAssoc e1)
                                   (changeAssoc e2))
+changeAssoc (EVar str)     =  (EVar str)                               
 changeAssoc (EBin op e1 e2) = (EBin op (changeAssoc e1) (changeAssoc e2))
             
 --pbool -> int comp int | bool op pbool | bool
