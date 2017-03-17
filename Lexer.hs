@@ -1,6 +1,6 @@
 module Lexer where
 
-import Control.Monad 
+import Control.Monad
 import Text.Parsec hiding (crlf)
 import Text.Parsec.String
 import Control.Applicative ((<*))
@@ -30,7 +30,7 @@ parenB = do
   return (EParens e)
 
 --Clears whitespace
-whitespace = void $ many $ oneOf" \t\n"
+whitespace = void . many $ oneOf" \t\n"
 
 --Clears newlines
 crlf = many $ oneOf "\n"
@@ -90,6 +90,15 @@ psub = do
   whitespace
   return $ EBin Sub e1 e2
 
+--Parses negative
+pneg = do
+  whitespace
+  string "cronenberg"
+  whitespace
+  e1 <- op3
+  whitespace
+  return $ EUOp Neg e1
+
 --BOOLEAN OPERATOR PARSER--
 
 --Parses and
@@ -143,6 +152,15 @@ numGt = do
   e2 <- op3
   whitespace
   return $ EBin LessThan e1 e2
+
+--Parses not
+bnot = do
+  whitespace
+  string "not "
+  whitespace
+  e1 <- op1
+  whitespace
+  return $ EUOp Not e1
 
 --STATEMENTS--
 
@@ -250,10 +268,10 @@ expr = try op1
 --NUMBER OPS--
 
 op1 = try band <|> try bor <|> op2
-op2 = try numEq <|> try numLt <|> try numGt <|> op3
+op2 = try numEq <|> try numLt <|> try numGt <|> try bnot <|> op3
 op3 = try padd <|> try psub <|> op4
 op4 = try pmul <|> try pdiv <|> try pmod  <|> pterm
-pterm = try base <|> try parenA <|> try parenB <|> try pvar
+pterm = try base <|> try parenA <|> try parenB <|> try pneg <|>  try pvar
   where base = pint <|> try bRight <|> try bWrong
 
 pint :: Parser Exp
@@ -309,11 +327,11 @@ changeAssocStmt :: Stmt -> Stmt
 changeAssocStmt (SDecl str e) =  (SDecl str (changeAssoc e))
 changeAssocStmt (SWhile e stmlist) =
                 (SWhile (changeAssoc e)
-                (map changeAssocStmt stmlist))
+                (fmap changeAssocStmt stmlist))
 changeAssocStmt (SIf e stmlist1 stmlist2) =
                 (SIf (changeAssoc e)
-                (map changeAssocStmt stmlist1)
-                (map changeAssocStmt stmlist2))
+                (fmap changeAssocStmt stmlist1)
+                (fmap changeAssocStmt stmlist2))
 changeAssocStmt (SPrint str)  = (SPrint str)
 changeAssocStmt (SPortal str) = (SPortal str)
 
@@ -354,7 +372,7 @@ changeAssoc (EBin Mod e1 (EBin Mod e2 e3)) =
 changeAssoc (EIf cond e1 e2)= (EIf (changeAssoc cond)
                                   (changeAssoc e1)
                                   (changeAssoc e2))
-changeAssoc (EVar str)     =  (EVar str)                               
+changeAssoc (EVar str)     =  (EVar str)
 changeAssoc (EBin op e1 e2) = (EBin op (changeAssoc e1) (changeAssoc e2))
 
 --RUN FUNCTION: takes the text of an input file, parses, and runs stepUni on the output parse tree
