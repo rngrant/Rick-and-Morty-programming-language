@@ -82,19 +82,19 @@ type Print = [String]
 --Evaluates Integer binary operations at the base level
 evalIntBOp :: (Int -> Int -> Int) -> (Maybe Value) -> (Maybe Value) -> (Maybe Value)
 evalIntBOp op v1 v2 = case (v1, v2) of
-  (Just (VInt n1), Just (VInt n2)) -> Just $ VInt $ op n1 n2
+  (Just (VInt n1), Just (VInt n2)) -> Just . VInt $ op n1 n2
   _ -> Nothing
 
---Evaluates Boolean binary expressions at the base level  
+--Evaluates Boolean binary expressions at the base level
 evalBoolBOp :: (Bool -> Bool -> Bool) -> (Maybe Value) -> (Maybe Value) -> (Maybe Value)
 evalBoolBOp op v1 v2 = case (v1, v2) of
-  (Just (VBool b1), Just (VBool b2)) -> Just $ VBool $ op b1 b2
+  (Just (VBool b1), Just (VBool b2)) -> Just . VBool $ op b1 b2
   _ -> Nothing
 
 --Evaluates Integer Boolean binary expressions at the base level
 evalIntBoolBOp :: (Int -> Int -> Bool) -> (Maybe Value) -> (Maybe Value) -> (Maybe Value)
 evalIntBoolBOp op v1 v2 = case (v1, v2) of
-  (Just (VInt n1), Just (VInt n2)) -> Just $ VBool $ op n1 n2
+  (Just (VInt n1), Just (VInt n2)) -> Just . VBool $ op n1 n2
   _ -> Nothing
 
 --eval function
@@ -109,7 +109,7 @@ eval env (EUOp Neg e) = case eval env e of
   Just (VInt n) -> Just $ VInt (-n)
   _ -> Nothing
 eval env (EUOp Not e) = case eval env e of
-  Just (VBool b) -> Just $ VBool $ not b
+  Just (VBool b) -> Just . VBool $ not b
   _ -> Nothing
 eval env (EBin Add e1 e2) = evalIntBOp (+) (eval env e1) (eval env e2)
 eval env (EBin Sub e1 e2) = evalIntBOp (-) (eval env e1) (eval env e2)
@@ -144,7 +144,7 @@ exec _ env _ (SDecl s e) =
   case eval env e of
     Just val  ->
       case lookup s env of
-        Just v  -> (((filter (\x -> fst x /= s) env) ++ [(s, val)], []),[]) 
+        Just v  -> (((filter (\x -> fst x /= s) env) ++ [(s, val)], []),[])
         Nothing -> (((env ++ [(s , val)]), []),[])
     Nothing -> error "You really fucked it up here: Unable to evaluate passed expression"
 
@@ -217,4 +217,3 @@ stepUni env prt (Right []) = error "You have destroyed the multiverse"
 
 --Run stepProg on the first universe declared in the given file.
 stepUni env prt (Right (s:block)) = stepProg (s:block) env prt [(snd s)]
-
