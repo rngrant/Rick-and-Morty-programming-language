@@ -6,6 +6,7 @@ module CodeGen where
 
 import Text.Parsec
 import Text.Parsec.String
+import Control.Monad.Except
 
 data BOp where
   Add :: BOp
@@ -19,6 +20,32 @@ data BOp where
   And :: BOp
   Or :: BOp
   deriving (Eq)
+
+-- Errors
+
+data Exception = NumArgs Integer [Value]
+               | TypeMismatch String Value
+               | Parser ParseError
+               | BadSpecialForm String Value
+
+showError :: Exception -> String
+showError (NumArgs x vals)     = "Expected " ++ show x ++ ", found" ++ show vals
+showError (TypeMismatch e f)   = "Invalid type: expected " ++ e ++ ", found " ++ show f
+showError (Parser p)           = "Parse error at " ++ show p
+showError (BadSpecialForm s v) = s ++ ": " ++ show v
+
+instance Show Exception where show = showError
+
+type ThrowsError = Either Exception
+
+-- Error helpers
+
+trapError action = catchError action (return . show)
+
+extractValue :: ThrowsError a -> a
+extractValue (Right val) = val
+
+
 
 instance Show BOp where
   show Add = "Add"
@@ -207,10 +234,10 @@ stepProg m env prt ((s:prog):xs) =
 
 --stepUni [Called from main() in Lexer.hs to execute Lexed parse tree].
 --takes an environment (initialized to []), a print buffer (initialized to []), and an Either ParseError Multi and returns ((The current environment, the current program list (should be [] when finished)), the Print Buffer)
-stepUni :: Env -> Print -> Either ParseError Multi -> ((Env, Prog), Print)
+stepUni :: Env -> Print -> Either Exception Multi -> ((Env, Prog), Print)
 
 --When there was a parse error in lexing the multiverse, return an error
-stepUni _ _ (Left e) = error "Universe Parse error"
+stepUni _ _ (Left e) = error "Universe parse error"
 
 --If there was no universe declared, return an error
 stepUni env prt (Right []) = error "You have destroyed the multiverse"

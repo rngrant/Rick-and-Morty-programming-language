@@ -7,6 +7,7 @@ import Control.Applicative ((<*))
 import CodeGen
 import Debug.Trace
 import Optimizations
+import Control.Monad.Except
 
 --Parses arithmetic operations within parentheses
 parenA = do
@@ -307,9 +308,14 @@ pvar = do
   whitespace
   return $ EVar v
 
+readExpr :: String -> ThrowsError Multi
+readExpr src = case parse (many1 uParse <* eof) "" src of
+  Left err -> throwError $ Parser err
+  Right val -> return val
+
 --Calls parse on src expecting at least one univ term
-parseExp :: String -> Either ParseError Multi
-parseExp src = fmap optimizeMulti (parse (many1 uParse <* eof) "" src)
+parseExp :: String -> ThrowsError Multi
+parseExp src = fmap optimizeMulti (readExpr src)
 
 -- Code for testing parsed expresions
 {-
