@@ -12,11 +12,11 @@ optimizeMulti ((str,progs):ms) =
 
 -- maps AST optimizations over statements
 optimize :: (Exp -> Exp) -> Stmt -> Stmt
-optimize f (SDecl str e)      = SDecl str (f e)
-optimize f (SWhile e stmlist) = SWhile (f e) (fmap (optimize f) stmlist)
-optimize f (SIf e sl1 sl2)    = SIf (f e) (fmap (optimize f) sl1) (fmap (optimize f) sl2)
-optimize _ (SPrint str)       = SPrint str
-optimize _ (SPortal str)      = SPortal str
+optimize f (SDecl pos str e)      = SDecl pos str (f e)
+optimize f (SWhile pos e stmlist) = SWhile pos (f e) (fmap (optimize f) stmlist)
+optimize f (SIf pos e sl1 sl2)    = SIf pos (f e) (fmap (optimize f) sl1) (fmap (optimize f) sl2)
+optimize _ (SPrint pos str)       = SPrint pos str
+optimize _ (SPortal pos str)      = SPortal pos str
 
 -- composition of all AST optimizations
 optimizations :: Exp -> Exp

@@ -169,6 +169,7 @@ bnot = do
 --Parses if statements
 sIf = do
   whitespace
+  p <- getPosition
   string "if"
   whitespace
   e1 <- op1
@@ -183,31 +184,34 @@ sIf = do
   whitespace
   string "wubalubadubdub"
   whitespace
-  return $ SIf e1 s1 s2
+  return $ SIf p e1 s1 s2
 
 --Parses variable declaration
 sDec = do
-  whitespace
+  whitespace 
+  p <- getPosition
   s <- many1 letter
   whitespace
   string "means"
   whitespace
   e <- expr
   whitespace
-  return $ SDecl s e
+  return $ SDecl p s e
 
 --Parses print statements
 sPrint = do
   whitespace
+  p <- getPosition
   string "show me"
   whitespace
   s <- many1 letter
   whitespace
-  return $ SPrint s
+  return $ SPrint p s
 
 --Parses while statements
 sWhile = do
   whitespace
+  p <- getPosition
   string "while"
   whitespace
   e <- op1
@@ -218,18 +222,19 @@ sWhile = do
   whitespace
   string "thanks Summer"
   whitespace
-  return $ SWhile e s
+  return $ SWhile p e s
 
 --Parses portal statements for multithreaded jumps
 sPortal = do
   whitespace
+  p <- getPosition
   string "lets grab our"
   whitespace
   u <- many1 letter
   whitespace
   string "and portal out of here"
   whitespace
-  return $ SPortal u
+  return $ SPortal p u
 
 
 --UNIVERSE--

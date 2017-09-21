@@ -1,5 +1,4 @@
 {-# LANGUAGE GADTs #-}
-
 {-Base code provide by Charlie Curtsinger-}
 
 module CodeGen where
@@ -93,11 +92,11 @@ data Value where
   deriving (Eq, Show)
 
 data Stmt where
-  SDecl :: String -> Exp -> Stmt
-  SWhile :: Exp -> [Stmt] -> Stmt
-  SIf :: Exp -> [Stmt] -> [Stmt] -> Stmt
-  SPrint :: String -> Stmt
-  SPortal :: String -> Stmt
+  SDecl :: SourcePos -> String -> Exp -> Stmt
+  SWhile :: SourcePos -> Exp -> [Stmt] -> Stmt
+  SIf :: SourcePos -> Exp -> [Stmt] -> [Stmt] -> Stmt
+  SPrint :: SourcePos -> String -> Stmt
+  SPortal :: SourcePos -> String -> Stmt
   deriving (Eq, Show)
 
 type Prog = [Stmt]
@@ -167,48 +166,48 @@ exec :: Multi -> Env -> Print -> Stmt -> ((Env, [Stmt]), Print)
 
 --Variable Declaration
 --Checks the given String s in the environment. If s is found, updates the value of s with the executed value of e. If s was not found, adds the ordered pair (s, eval env e).
-exec _ env _ (SDecl s e) =
+exec _ env _ (SDecl pos s e) =
   case eval env e of
     Just val  ->
       case lookup s env of
         Just v  -> (((filter (\x -> fst x /= s) env) ++ [(s, val)], []),[])
         Nothing -> (((env ++ [(s , val)]), []),[])
-    Nothing -> error "You really fucked it up here: Unable to evaluate passed expression"
+    Nothing -> error $ "You really fucked it up here: Unable to evaluate passed expression " ++ (show pos)
 
 --While Loops
 --Checks if the eval of e is True or False.
 ----If e == False, returns the same environment, returns no new statements, returns no new prints
 ----If e == True, returns the same environment, returns s with the input While statement appended to the end, returns no new prints
-exec _ env _ (SWhile e s) =
+exec _ env _ (SWhile pos e s) =
   case eval env e of
-    Just (VBool True) -> ((env, (s ++ [SWhile e s])),[])
+    Just (VBool True) -> ((env, (s ++ [SWhile pos e s])),[])
     Just (VBool False) -> ((env, []),[])
-    Nothing -> error "You really fucked it up here: Passed expression not resolved to boolean"
+    Nothing -> error $ "You really fucked it up here: Passed expression not resolved to boolean " ++ (show pos)
 
 --Prints Statements
 --Will only print variables.
 --Returns the same environment, returns no new statements, returns the value of the variable s to the print buffer
-exec _ env prt (SPrint s) =
+exec _ env prt (SPrint pos s) =
   case lookup s env of
     Just v -> ((env, []), [show v])
-    Nothing -> error "You really fucked it up here: Variable not found"
+    Nothing -> error $ "You really fucked it up here: Variable not found " ++ (show pos)
 
 --If Statements
 --Evaluates the given boolean expression e
 ----If e == False, returns the same environment, returns the false branch of the if statement, returns no new prints
 ----If e == True , returns the same environment, returns the true  branch of the if statement, returns no new prints
-exec _ env _ (SIf e s1 s2) =
+exec _ env _ (SIf pos e s1 s2) =
   case eval env e of
     Just (VBool True)  -> ((env, s1),[])
     Just (VBool False) -> ((env, s2),[])
-    _          -> error "You really fucked it up here: Unable to evaluate given boolean"
+    _          -> error $ "You really fucked it up here: Unable to evaluate given boolean " ++ (show pos)
 
 --Portal Statements
 --This function searches the multiverse for an ordered pair starting with the passed string. If the string is found, the program paired with that string is returned. No environment updates or print updates
-exec m env _ (SPortal u) =
+exec m env _ (SPortal pos u) =
   case lookup u m of
     Just p -> ((env, p), [])
-    _ -> error "You really fucked it up here: Universe not found"
+    _ -> error $ "You really fucked it up here: Universe not found " ++ (show pos)
 
 --stepProg takes the entire multiverse, the current environment, the current print buffer, and the list programs currently being executed and returns the resulting ((Enviornment, Program), and Print Buffer)
 --Uses pattern matching on the Program list to determine action
@@ -219,8 +218,8 @@ stepProg :: Multi -> Env -> Print -> [Prog] -> ((Env, Prog), Print)
 stepProg _ env prt [] = ((env, []),prt)
 
 --The current statement is a Portal statement. Take the programatic output of this and append it to the end of the program list as its own, independent program. Append tail of the 'current' program to the end of the program list
-stepProg m env prt (((SPortal u):prog):xs) =
-  let ((_, prog'), _) = exec m env prt (SPortal u)
+stepProg m env prt (((SPortal pos u):prog):xs) =
+  let ((_, prog'), _) = exec m env prt (SPortal pos u)
     in stepProg m env prt (xs ++ ([prog'] ++ [prog]))
 
 --The current program contains no more statements. End execution of this program and run stepProg on the rest of the program lsit.
