@@ -69,22 +69,22 @@ instance Show UOp where
   show Not = "Not"
 
 data Exp where
-  EIntLit :: Int -> Exp
-  EBoolLit :: Bool -> Exp
-  EUOp :: UOp -> Exp -> Exp
-  EBin :: BOp -> Exp -> Exp -> Exp
-  EIf :: Exp -> Exp -> Exp -> Exp
-  EParens :: Exp -> Exp
-  EVar :: String -> Exp
+  EIntLit :: SourcePos -> Int -> Exp
+  EBoolLit :: SourcePos -> Bool -> Exp
+  EUOp :: SourcePos -> UOp -> Exp -> Exp
+  EBin :: SourcePos -> BOp -> Exp -> Exp -> Exp
+  EIf :: SourcePos -> Exp -> Exp -> Exp -> Exp
+  EParens :: SourcePos -> Exp -> Exp
+  EVar :: SourcePos -> String -> Exp
   deriving (Eq, Show)
 
---Basically the pretty print function. This is a debug function.
+--Basically the pretty print function. 
 say :: Exp -> String
-say (EIntLit n) = show n
-say (EBoolLit b) = show b
-say (EUOp op e) = "YouGotta " ++ (show op) ++ (say e) ++ " Morty"
-say (EBin op e1 e2) = "YouGotta " ++ (say e1) ++ (show op) ++ (say e2) ++ " Morty"
-say (EIf cond e1 e2) = "If " ++ (say cond) ++ " then " ++ (say e1) ++ " otherwise " ++ (say e2)
+say (EIntLit _ n) = show n
+say (EBoolLit _ b) = show b
+say (EUOp _ op e) = "YouGotta " ++ (show op) ++ (say e) ++ " Morty"
+say (EBin _ op e1 e2) = "YouGotta " ++ (say e1) ++ (show op) ++ (say e2) ++ " Morty"
+say (EIf _ cond e1 e2) = "If " ++ (say cond) ++ " then " ++ (say e1) ++ " otherwise " ++ (say e2)
 
 data Value where
   VInt :: Int -> Value
@@ -105,6 +105,7 @@ type Block = (String, Prog)
 type Multi = [Block]
 type Print = [String]
 
+--TODO: reevaluate the `(min p1 p2)` usage -- why?
 --Evaluates Integer binary operations at the base level
 evalIntBOp :: (Int -> Int -> Int) -> (Maybe Value) -> (Maybe Value) -> (Maybe Value)
 evalIntBOp op v1 v2 = case (v1, v2) of
@@ -128,30 +129,30 @@ evalIntBoolBOp op v1 v2 = case (v1, v2) of
 --Uses pattern matching to match the given expression in order to subevaluate the parameters of the expression
 --At the base level, this function calls evalIntBOp, evalBoolBOp, and evalIntBoolBOp to eval base expressions
 eval :: Env -> Exp -> Maybe Value
-eval env (EVar x) = lookup x env
-eval env (EIntLit n) = Just $ VInt n
-eval env (EBoolLit b) = Just $ VBool b
-eval env (EUOp Neg e) = case eval env e of
+eval env (EVar _ x) = lookup x env
+eval env (EIntLit _ n) = Just $ VInt n
+eval env (EBoolLit _ b) = Just $ VBool b
+eval env (EUOp _ Neg e) = case eval env e of
   Just (VInt n) -> Just $ VInt (-n)
   _ -> Nothing
-eval env (EUOp Not e) = case eval env e of
+eval env (EUOp _ Not e) = case eval env e of
   Just (VBool b) -> Just . VBool $ not b
   _ -> Nothing
-eval env (EBin Add e1 e2) = evalIntBOp (+) (eval env e1) (eval env e2)
-eval env (EBin Sub e1 e2) = evalIntBOp (-) (eval env e1) (eval env e2)
-eval env (EBin Mul e1 e2) = evalIntBOp (*) (eval env e1) (eval env e2)
-eval env (EBin Div e1 e2) = evalIntBOp div (eval env e1) (eval env e2)
-eval env (EBin Mod e1 e2) = evalIntBOp mod (eval env e1) (eval env e2)
-eval env (EBin And e1 e2) = evalBoolBOp (&&) (eval env e1) (eval env e2)
-eval env (EBin Or e1 e2) = evalBoolBOp (||) (eval env e1) (eval env e2)
-eval env (EBin Equals e1 e2) = evalIntBoolBOp (==) (eval env e1) (eval env e2)
-eval env (EBin LessThan e1 e2) = evalIntBoolBOp (<) (eval env e1) (eval env e2)
-eval env (EBin GreaterThan e1 e2) = evalIntBoolBOp (>) (eval env e1) (eval env e2)
-eval env (EIf cond e1 e2) = case eval env cond of
+eval env (EBin _ Add e1 e2) = evalIntBOp (+) (eval env e1) (eval env e2)
+eval env (EBin _ Sub e1 e2) = evalIntBOp (-) (eval env e1) (eval env e2)
+eval env (EBin _  Mul e1 e2) = evalIntBOp (*) (eval env e1) (eval env e2)
+eval env (EBin _ Div e1 e2) = evalIntBOp div (eval env e1) (eval env e2)
+eval env (EBin _ Mod e1 e2) = evalIntBOp mod (eval env e1) (eval env e2)
+eval env (EBin _ And e1 e2) = evalBoolBOp (&&) (eval env e1) (eval env e2)
+eval env (EBin _ Or e1 e2) = evalBoolBOp (||) (eval env e1) (eval env e2)
+eval env (EBin _ Equals e1 e2) = evalIntBoolBOp (==) (eval env e1) (eval env e2)
+eval env (EBin _ LessThan e1 e2) = evalIntBoolBOp (<) (eval env e1) (eval env e2)
+eval env (EBin _ GreaterThan e1 e2) = evalIntBoolBOp (>) (eval env e1) (eval env e2)
+eval env (EIf _ cond e1 e2) = case eval env cond of
   Just (VBool True) -> eval env e1
   Just (VBool False) -> eval env e2
   _ -> Nothing
-eval env (EParens e) = eval env e
+eval env (EParens _ e) = eval env e
 
 
 data Typ where

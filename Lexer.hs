@@ -1,35 +1,35 @@
 module Lexer where
+import Control.Monad 
+import Text.Parsec hiding (crlf) 
+import Text.Parsec.String 
+import Control.Applicative ((<*)) 
+import CodeGen 
+import Debug.Trace 
+import Optimizations 
+import Control.Monad.Except 
 
-import Control.Monad
-import Text.Parsec hiding (crlf)
-import Text.Parsec.String
-import Control.Applicative ((<*))
-import CodeGen
-import Debug.Trace
-import Optimizations
-import Control.Monad.Except
-
---Parses arithmetic operations within parentheses
 parenA = do
   whitespace
+  p <- getPosition
   void $ string "you gotta"
   whitespace
   e <- op3
   whitespace
   void $ string "Morty"
   whitespace
-  return (EParens e)
+  return (EParens p e)
 
 --Parses boolean operation within parentheses
 parenB = do
   whitespace
+  p <- getPosition
   void $ string "you gotta"
   whitespace
   e <- op1
   whitespace
   void $ string "Morty"
   whitespace
-  return (EParens e)
+  return (EParens p e)
 
 --Clears whitespace
 whitespace = void . many $ oneOf" \t\n"
@@ -40,129 +40,141 @@ crlf = many $ oneOf "\n"
 --Parses multiplication
 pmul = do
   whitespace
+  p <- getPosition 
   e1 <- pterm
   whitespace
   string "times"
   whitespace
   e2 <- op4
   whitespace
-  return $ EBin Mul e1 e2
+  return $ EBin p Mul e1 e2
 
 --Parses division
 pdiv = do
   whitespace
+  p <- getPosition
   e1 <- pterm
   whitespace
   string "divided by"
   whitespace
   e2 <- op4
   whitespace
-  return $ EBin Div e1 e2
+  return $ EBin p Div e1 e2
 
 --Parses modulo
 pmod = do
   whitespace
+  p <- getPosition 
   e1 <- pterm
   whitespace
   string "mod"
   whitespace
   e2 <- op4
   whitespace
-  return $ EBin Mod e1 e2
+  return $ EBin p Mod e1 e2
 
 --Parses addition
 padd = do
   whitespace
+  p <- getPosition 
   e1 <- op4
   whitespace
   string "plus"
   whitespace
   e2 <- op3
   whitespace
-  return $ EBin Add e1 e2
+  return $ EBin p Add e1 e2
 
 --Parses subtraction
 psub = do
   whitespace
+  p <- getPosition 
   e1 <- op4
   whitespace
   string "minus"
   whitespace
   e2 <- op3
   whitespace
-  return $ EBin Sub e1 e2
+  return $ EBin p Sub e1 e2
 
 --Parses negative
 pneg = do
   whitespace
+  p <- getPosition 
   string "cronenberg"
   whitespace
   e1 <- op3
   whitespace
-  return $ EUOp Neg e1
+  return $ EUOp p Neg e1
 
 --BOOLEAN OPERATOR PARSER--
 
 --Parses and
 band = do
   whitespace
+  p <- getPosition 
   e1 <- op2
   whitespace
   string "and"
   whitespace
   e2 <- op1
   whitespace
-  return $ EBin And e1 e2
+  return $ EBin p And e1 e2
 
 --Parses or
 bor = do
   whitespace
+  p <- getPosition 
   e1 <- op2
   whitespace
   string "or"
   whitespace
   e2 <- op1
   whitespace
-  return $ EBin Or e1 e2
+  return $ EBin p Or e1 e2
 
 --Parses numeric equality
 numEq = do
   whitespace
+  p <- getPosition 
   e1 <- op3
   whitespace
   string "is the same as"
   e2 <- op3
   whitespace
-  return $ EBin Equals e1 e2
+  return $ EBin p Equals e1 e2
 
 --Parses numeric less than
 numLt = do
   whitespace
+  p <- getPosition 
   e1 <- op3
   whitespace
   string "is less than"
   e2 <- op3
   whitespace
-  return $ EBin LessThan e1 e2
+  return $ EBin p LessThan e1 e2
 
 --Parses numeric greater than
 numGt = do
   whitespace
+  p <- getPosition 
   e1 <- op3
   whitespace
   string "is greater than"
   e2 <- op3
   whitespace
-  return $ EBin LessThan e1 e2
+  return $ EBin p LessThan e1 e2
 
 --Parses not
 bnot = do
   whitespace
-  string "not "
+  p <- getPosition 
+  string "not"
   whitespace
   e1 <- op1
   whitespace
-  return $ EUOp Not e1
+  return $ EUOp p Not e1
 
 --STATEMENTS--
 
@@ -284,34 +296,38 @@ pterm = try base <|> try parenA <|> try parenB <|> try pneg <|>  try pvar
 pint :: Parser Exp
 pint = do
   whitespace
+  p <- getPosition 
   n <- many1 digit
   whitespace
-  return $ EIntLit (read n)
+  return $ EIntLit p (read n)
 
 --BOOL OPS--
 
 bRight :: Parser Exp
 bRight = do
   whitespace
+  p <- getPosition 
   string "right"
   whitespace
-  return $ EBoolLit True
+  return $ EBoolLit p True
 
 bWrong :: Parser Exp
 bWrong = do
   whitespace
+  p <- getPosition 
   string "wrong"
   whitespace
-  return $ EBoolLit False
+  return $ EBoolLit p False
 
 --VARS--
 
 pvar :: Parser Exp
 pvar = do
   whitespace
+  p <- getPosition 
   v <- many1 letter
   whitespace
-  return $ EVar v
+  return $ EVar p v
 
 readExpr :: String -> ThrowsError Multi
 readExpr src = case parse (many1 uParse <* eof) "" src of
