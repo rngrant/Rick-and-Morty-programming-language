@@ -140,7 +140,7 @@ eval env (EUOp _ Not e) = case eval env e of
   _ -> Nothing
 eval env (EBin _ Add e1 e2) = evalIntBOp (+) (eval env e1) (eval env e2)
 eval env (EBin _ Sub e1 e2) = evalIntBOp (-) (eval env e1) (eval env e2)
-eval env (EBin _  Mul e1 e2) = evalIntBOp (*) (eval env e1) (eval env e2)
+eval env (EBin _ Mul e1 e2) = evalIntBOp (*) (eval env e1) (eval env e2)
 eval env (EBin _ Div e1 e2) = evalIntBOp div (eval env e1) (eval env e2)
 eval env (EBin _ Mod e1 e2) = evalIntBOp mod (eval env e1) (eval env e2)
 eval env (EBin _ And e1 e2) = evalBoolBOp (&&) (eval env e1) (eval env e2)

@@ -7,6 +7,9 @@ import CodeGen
 import Debug.Trace 
 import Optimizations 
 import Control.Monad.Except 
+import System.IO
+import System.Environment
+import System.FilePath.Posix
 
 parenA = do
   whitespace
@@ -170,7 +173,7 @@ numGt = do
 bnot = do
   whitespace
   p <- getPosition 
-  string "not"
+  string "not "
   whitespace
   e1 <- op1
   whitespace
@@ -344,13 +347,20 @@ testParseExp :: String -> Either ParseError Exp
 testParseExp src = parse (expr <* eof) "" src
 -}
 
-
---RUN FUNCTION: takes the text of an input file, parses, and runs stepUni on the output parse tree
+--RUN FUNCTION: takes an input file, checks file extension, parses, and runs stepUni on the output parse tree
 main :: IO ()
 main = do
-  file <- getContents
-  let ((_,_),prt) = stepUni [] [] (parseExp file)
+  filenames <- getArgs
+  grmFiles <- return $ filter (\f -> (takeExtension f) == ".grm") filenames
+  let file = case grmFiles of
+               (x:xs) -> x
+               []    -> error $ "Please pass valid GRAMPA file"
+  handle <- openFile file  ReadMode
+  f <- hGetContents handle
+  --file <- getContents
+  let ((_,_),prt) = stepUni [] [] (parseExp f)
   putStr $ concat (map (++ "\n") prt)
+  hClose handle
 
 --DEBUG FUNCTION: Returns parse tree of given input file
 {-
