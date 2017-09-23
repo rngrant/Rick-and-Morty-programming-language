@@ -160,6 +160,51 @@ data Typ where
   TBool :: Typ
   deriving (Eq, Show)
 
+expectTypes :: Env -> Typ -> Exp -> Typ -> Exp -> Typ -> Maybe Typ
+expectTypes env t1 e1 t2 e2 result = case (typecheck env e1, typecheck env e2) of
+  (Just e1t, Just e2t) -> if e1t == t1 && e2t == t2
+    then Just result
+    else Nothing
+  _ -> Nothing
+
+
+typecheck :: Env -> Exp -> Maybe Typ
+typecheck env (EVar _ x) = 
+  case lookup x env of
+    Just (VBool _) -> Just TBool
+    Just (VInt _)  -> Just TInt
+    Nothing        -> Nothing
+typecheck env (EIntLit _ n) = Just TInt 
+typecheck env (EBoolLit _ b) = Just TBool
+typecheck env (EUOp _ Neg e) = 
+  case typecheck env e of
+    Just TInt -> Just TInt
+    _ -> Nothing
+typecheck env (EUOp _ Not e) = 
+  case typecheck env e of
+    Just TBool -> Just TBool
+    _ -> Nothing
+typecheck env (EBin _ Add e1 e2) = expectTypes env TInt e1 TInt e2 TInt
+typecheck env (EBin _ Sub e1 e2) = expectTypes env TInt e1 TInt e2 TInt
+typecheck env (EBin _ Mul e1 e2) = expectTypes env TInt e1 TInt e2 TInt
+typecheck env (EBin _ Div e1 e2) = expectTypes env TInt e1 TInt e2 TInt
+typecheck env (EBin _ Mod e1 e2) = expectTypes env TInt e1 TInt e2 TInt
+typecheck env (EBin _ And e1 e2) = expectTypes env TBool e1 TBool e2 TBool
+typecheck env (EBin _ Or e1 e2) =  expectTypes env TBool e1 TBool e2 TBool
+typecheck env (EBin _ Equals e1 e2) = expectTypes env TInt e1 TInt e2 TBool
+typecheck env (EBin _ LessThan e1 e2) = expectTypes env TInt e1 TInt e2 TBool
+typecheck env (EBin _ GreaterThan e1 e2) = expectTypes env TInt e1 TInt e2 TBool
+typecheck env (EIf _ cond e1 e2) = case typecheck env cond of
+  Just TBool -> case (typecheck env e1, typecheck env e2) of
+    (Just t1, Just t2) -> if t1 == t2 then Just t1 else Nothing
+  _ -> Nothing
+typecheck env (EParens _ e) = typecheck env e
+
+safeEval :: Env -> Exp -> Maybe Value
+safeEval env e = case typecheck env e of 
+  Just _ -> eval env e
+  _      -> Nothing
+
 --Exec function
 --Takes the entire multiverse, the current variable environment, the current print buffer, and a statement to execute and returns ((A new variable environment, a list of statements to be added to the execution list), any new strings to be added to the print buffer).
 --Runs via pattern matching on the type of statement being evaluated.
@@ -168,7 +213,7 @@ exec :: Multi -> Env -> Print -> Stmt -> ((Env, [Stmt]), Print)
 --Variable Declaration
 --Checks the given String s in the environment. If s is found, updates the value of s with the executed value of e. If s was not found, adds the ordered pair (s, eval env e).
 exec _ env _ (SDecl pos s e) =
-  case eval env e of
+  case safeEval env e of
     Just val  ->
       case lookup s env of
         Just v  -> (((filter (\x -> fst x /= s) env) ++ [(s, val)], []),[])
@@ -180,7 +225,7 @@ exec _ env _ (SDecl pos s e) =
 ----If e == False, returns the same environment, returns no new statements, returns no new prints
 ----If e == True, returns the same environment, returns s with the input While statement appended to the end, returns no new prints
 exec _ env _ (SWhile pos e s) =
-  case eval env e of
+  case safeEval env e of
     Just (VBool True) -> ((env, (s ++ [SWhile pos e s])),[])
     Just (VBool False) -> ((env, []),[])
     Nothing -> error $ "You really fucked it up here: Passed expression not resolved to boolean " ++ (show pos)
@@ -198,7 +243,7 @@ exec _ env prt (SPrint pos s) =
 ----If e == False, returns the same environment, returns the false branch of the if statement, returns no new prints
 ----If e == True , returns the same environment, returns the true  branch of the if statement, returns no new prints
 exec _ env _ (SIf pos e s1 s2) =
-  case eval env e of
+  case safeEval env e of
     Just (VBool True)  -> ((env, s1),[])
     Just (VBool False) -> ((env, s2),[])
     _          -> error $ "You really fucked it up here: Unable to evaluate given boolean " ++ (show pos)
