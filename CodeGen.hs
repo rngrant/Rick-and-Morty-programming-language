@@ -5,7 +5,8 @@ module CodeGen where
 
 import Text.Parsec
 import Text.Parsec.String
-import Control.Monad.Except
+import Control.Monad.Except 
+
 
 data BOp where
   Add :: BOp
@@ -78,6 +79,18 @@ data Exp where
   EVar :: SourcePos -> String -> Exp
   deriving (Eq, Show)
 
+-- Returns original parse position of expression
+-- In order to generate more helpful type errors
+getPos :: Exp -> String
+getPos (EIntLit p _ ) = show p
+getPos (EBoolLit p _) = show p
+getPos (EUOp p _ _)   = show p
+getPos (EBin p _ _ _) = show p
+getPos (EIf p _ _ _)  = show p
+getPos (EParens p _)  = show p
+getPos (EVar p _)     = show p
+
+
 --Basically the pretty print function. 
 say :: Exp -> String
 say (EIntLit _ n) = show n
@@ -98,6 +111,7 @@ data Stmt where
   SPrint :: SourcePos -> String -> Stmt
   SPortal :: SourcePos -> String -> Stmt
   deriving (Eq, Show)
+
 
 type Prog = [Stmt]
 type Env = [(String, Value)]
@@ -162,10 +176,10 @@ data Typ where
 
 expectTypes :: Env -> Typ -> Exp -> Typ -> Exp -> Typ -> Maybe Typ
 expectTypes env t1 e1 t2 e2 result = case (typecheck env e1, typecheck env e2) of
-  (Just e1t, Just e2t) -> if e1t == t1 && e2t == t2
-    then Just result
-    else Nothing
-  _ -> Nothing
+  (Just e1t, Just e2t) -> if e1t == t1 && e2t == t2 then Just result else error $ "Type error: " ++ (getPos e1)
+  (Just e1t, Nothing) -> error $ "Type error: " ++ (getPos e2)
+  (Nothing, Just e2t) -> error $ "Type error: " ++ (getPos e1)
+  _                   -> error $ "Type error: " ++ (getPos e1)
 
 
 typecheck :: Env -> Exp -> Maybe Typ
@@ -179,11 +193,11 @@ typecheck env (EBoolLit _ b) = Just TBool
 typecheck env (EUOp _ Neg e) = 
   case typecheck env e of
     Just TInt -> Just TInt
-    _ -> Nothing
+    _ -> error $ "Type error: " ++ getPos e
 typecheck env (EUOp _ Not e) = 
   case typecheck env e of
     Just TBool -> Just TBool
-    _ -> Nothing
+    _ -> error $ "Type error: " ++ getPos e
 typecheck env (EBin _ Add e1 e2) = expectTypes env TInt e1 TInt e2 TInt
 typecheck env (EBin _ Sub e1 e2) = expectTypes env TInt e1 TInt e2 TInt
 typecheck env (EBin _ Mul e1 e2) = expectTypes env TInt e1 TInt e2 TInt
@@ -194,12 +208,13 @@ typecheck env (EBin _ Or e1 e2) =  expectTypes env TBool e1 TBool e2 TBool
 typecheck env (EBin _ Equals e1 e2) = expectTypes env TInt e1 TInt e2 TBool
 typecheck env (EBin _ LessThan e1 e2) = expectTypes env TInt e1 TInt e2 TBool
 typecheck env (EBin _ GreaterThan e1 e2) = expectTypes env TInt e1 TInt e2 TBool
-typecheck env (EIf _ cond e1 e2) = case typecheck env cond of
+typecheck env (EIf p0 cond e1 e2) = case typecheck env cond of
   Just TBool -> case (typecheck env e1, typecheck env e2) of
-    (Just t1, Just t2) -> if t1 == t2 then Just t1 else Nothing
-  _ -> Nothing
+    (Just t1, Just t2) -> if t1 == t2 then Just t1 else error $ "Type error: " ++ getPos e1 ++ " and " ++ getPos e2 ++ " do not cohere"
+  _          -> error $ "Type error: " ++ (show p0)
 typecheck env (EParens _ e) = typecheck env e
 
+-- Eval with typechecker
 safeEval :: Env -> Exp -> Maybe Value
 safeEval env e = case typecheck env e of 
   Just _ -> eval env e
