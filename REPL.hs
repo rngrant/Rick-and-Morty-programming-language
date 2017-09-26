@@ -30,15 +30,16 @@ flushStr str = putStr str >> hFlush stdout
 readPrompt :: String -> IO String
 readPrompt prompt = flushStr prompt >> getLine
 
--- THIS WONT WORK YET
--- NEED TO THINK ABOUT HOW TO PARSE/EVAL FROM REPL
--- PROBABLY NEED TO PERSIST ENV, ETC
+-- TODO: figure out how to persist Env
+-- And how to turn statement execution into strings
 evalString :: String -> IO String
-evalString s = case parse expr "" s of
-  Left p  -> return $ show p
-  Right e -> case safeEval [] e of
-    Nothing -> return "Evaluation error"
-    Just v  -> return $ show v
+evalString s = case parse stmt "" s of
+  Left p  -> case parse expr "" s of 
+    Left p -> return "Parse error"
+    Right e -> case safeEval [] e of
+      Nothing -> return "Evalutation error"
+      Just v -> return $ show v
+  Right s -> return "Statement parsed" -- not a final solution
 
 evalAndPrint :: String -> IO ()
 evalAndPrint s = evalString s >>= putStrLn
@@ -62,14 +63,14 @@ main = do
 
 compile :: [String] -> IO ()
 compile fs = do  
-  grmFiles <- return $ filter (\f -> (takeExtension f) == ".grm") fs
+  grmFiles <- return $ filter (\f -> takeExtension f == ".grm") fs
   let file = case grmFiles of
                (x:xs) -> x
-               []    -> error $ "Please pass valid GRAMPA file"
+               []    -> error  "Please pass valid GRAMPA file"
   handle <- openFile file  ReadMode
   f <- hGetContents handle
   let ((_,_),prt) = stepUni [] [] (parseExp f)
-  putStr $ concat (map (++ "\n") prt)
+  putStr $ unlines prt 
   hClose handle
 
 --DEBUG FUNCTION: Returns parse tree of given input file
