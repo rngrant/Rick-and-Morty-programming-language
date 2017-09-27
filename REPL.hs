@@ -31,7 +31,6 @@ readPrompt :: String -> IO String
 readPrompt prompt = flushStr prompt >> getLine
 
 -- TODO: figure out how to persist Env
--- And how to turn statement execution into strings
 evalString :: String -> IO String
 evalString s = case parse stmt "" s of
   Left p  -> case parse expr "" s of 
