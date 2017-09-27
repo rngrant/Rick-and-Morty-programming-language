@@ -39,7 +39,8 @@ evalString s = case parse stmt "" s of
     Right e -> case safeEval [] e of
       Nothing -> return "Evalutation error"
       Just v -> return $ show v
-  Right s -> return "Statement parsed" -- not a final solution
+  Right s -> return $ unlines $ snd $ stmtExec [] [] [s]
+    
 
 evalAndPrint :: String -> IO ()
 evalAndPrint s = evalString s >>= putStrLn
@@ -83,3 +84,32 @@ main = do
     Right e -> do
       return $ concat $ map show e
 -}
+
+-- Function for executing a statement within the context of 
+--   the REPL: does not support parallelism. Slightly simpler
+--   version of execi
+stmtExec :: Env -> Print -> Prog -> ((Env, Prog), Print)
+stmtExec env p [] = ((env, []), p)
+stmtExec env p (SDecl pos str exp:xs) = case safeEval env exp of 
+  Just val ->
+    case lookup str env of
+      Just v -> stmtExec (filter (\x -> fst x /= str) env ++ [(str, val)]) p xs
+      Nothing -> stmtExec (env ++ [(str, val)]) p xs
+  Nothing -> error $ "You really fucked it up here: Unable to evaluate passed expression " ++ show p
+
+
+stmtExec env p (SWhile pos exp stmts:xs) = case safeEval env exp of 
+  Just (VBool True) -> stmtExec env p (xs ++ stmts)
+  Just (VBool False) -> stmtExec env p xs
+  Nothing -> error $ "You really fucked it up here: Passed expression not resolved to boolean " ++ show pos
+
+stmtExec env p (SIf pos exp tstmts fstmts:xs) = case safeEval env exp of
+  Just (VBool True) -> stmtExec env p (xs ++ tstmts)
+  Just (VBool False) -> stmtExec env p (xs ++ fstmts)
+  Nothing -> error $ "You really fucked it up here: Unable to evaluate given boolean " ++ show pos
+
+stmtExec env p (SPrint pos str:xs) = case lookup str env of 
+  Just v -> stmtExec env (p ++ [(show v)]) xs
+  Nothing -> error $  "You really fucked it up here: Variable not found " ++ show pos
+
+stmtExec env p (SPortal pos str:xs) = stmtExec env (p ++ ["REPL does not support parallelism"]) xs
