@@ -5,7 +5,7 @@ module CodeGen where
 
 import Text.Parsec
 import Text.Parsec.String
-import Control.Monad.Except 
+import Control.Monad.Except
 
 
 data BOp where
@@ -91,7 +91,7 @@ getPos (EParens p _)  = show p
 getPos (EVar p _)     = show p
 
 
---Basically the pretty print function. 
+--Basically the pretty print function.
 say :: Exp -> String
 say (EIntLit _ n) = show n
 say (EBoolLit _ b) = show b
@@ -102,7 +102,11 @@ say (EIf _ cond e1 e2) = "If " ++ (say cond) ++ " then " ++ (say e1) ++ " otherw
 data Value where
   VInt :: Int -> Value
   VBool :: Bool -> Value
-  deriving (Eq, Show)
+  deriving (Eq)
+
+instance Show Value where
+  show (VInt v) = show v
+  show (VBool b) = show b
 
 data Stmt where
   SDecl :: SourcePos -> String -> Exp -> Stmt
@@ -183,18 +187,18 @@ expectTypes env t1 e1 t2 e2 result = case (typecheck env e1, typecheck env e2) o
 
 
 typecheck :: Env -> Exp -> Maybe Typ
-typecheck env (EVar _ x) = 
+typecheck env (EVar _ x) =
   case lookup x env of
     Just (VBool _) -> Just TBool
     Just (VInt _)  -> Just TInt
     Nothing        -> Nothing
-typecheck env (EIntLit _ n) = Just TInt 
+typecheck env (EIntLit _ n) = Just TInt
 typecheck env (EBoolLit _ b) = Just TBool
-typecheck env (EUOp _ Neg e) = 
+typecheck env (EUOp _ Neg e) =
   case typecheck env e of
     Just TInt -> Just TInt
     _ -> error $ "Type error: " ++ getPos e
-typecheck env (EUOp _ Not e) = 
+typecheck env (EUOp _ Not e) =
   case typecheck env e of
     Just TBool -> Just TBool
     _ -> error $ "Type error: " ++ getPos e
@@ -216,7 +220,7 @@ typecheck env (EParens _ e) = typecheck env e
 
 -- Eval with typechecker
 safeEval :: Env -> Exp -> Maybe Value
-safeEval env e = case typecheck env e of 
+safeEval env e = case typecheck env e of
   Just _ -> eval env e
   _      -> Nothing
 

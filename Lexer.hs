@@ -1,12 +1,12 @@
 module Lexer where
-import Control.Monad 
-import Text.Parsec hiding (crlf) 
-import Text.Parsec.String 
-import Control.Applicative ((<*)) 
+import Control.Monad
+import Text.Parsec hiding (crlf)
+import Text.Parsec.String
+import Control.Applicative ((<*))
 import CodeGen
-import Debug.Trace 
+import Debug.Trace
 import Optimizations 
-import Control.Monad.Except 
+import Control.Monad.Except
 import System.IO
 
 parenA = do
@@ -41,7 +41,7 @@ crlf = many $ oneOf "\n"
 --Parses multiplication
 pmul = do
   whitespace
-  p <- getPosition 
+  p <- getPosition
   e1 <- pterm
   whitespace
   string "times"
@@ -65,7 +65,7 @@ pdiv = do
 --Parses modulo
 pmod = do
   whitespace
-  p <- getPosition 
+  p <- getPosition
   e1 <- pterm
   whitespace
   string "mod"
@@ -77,7 +77,7 @@ pmod = do
 --Parses addition
 padd = do
   whitespace
-  p <- getPosition 
+  p <- getPosition
   e1 <- op4
   whitespace
   string "plus"
@@ -89,7 +89,7 @@ padd = do
 --Parses subtraction
 psub = do
   whitespace
-  p <- getPosition 
+  p <- getPosition
   e1 <- op4
   whitespace
   string "minus"
@@ -101,7 +101,7 @@ psub = do
 --Parses negative
 pneg = do
   whitespace
-  p <- getPosition 
+  p <- getPosition
   string "cronenberg"
   whitespace
   e1 <- op3
@@ -113,7 +113,7 @@ pneg = do
 --Parses and
 band = do
   whitespace
-  p <- getPosition 
+  p <- getPosition
   e1 <- op2
   whitespace
   string "and"
@@ -125,7 +125,7 @@ band = do
 --Parses or
 bor = do
   whitespace
-  p <- getPosition 
+  p <- getPosition
   e1 <- op2
   whitespace
   string "or"
@@ -137,7 +137,7 @@ bor = do
 --Parses numeric equality
 numEq = do
   whitespace
-  p <- getPosition 
+  p <- getPosition
   e1 <- op3
   whitespace
   string "is the same as"
@@ -148,7 +148,7 @@ numEq = do
 --Parses numeric less than
 numLt = do
   whitespace
-  p <- getPosition 
+  p <- getPosition
   e1 <- op3
   whitespace
   string "is less than"
@@ -159,7 +159,7 @@ numLt = do
 --Parses numeric greater than
 numGt = do
   whitespace
-  p <- getPosition 
+  p <- getPosition
   e1 <- op3
   whitespace
   string "is greater than"
@@ -170,7 +170,7 @@ numGt = do
 --Parses not
 bnot = do
   whitespace
-  p <- getPosition 
+  p <- getPosition
   string "not "
   whitespace
   e1 <- op1
@@ -201,7 +201,7 @@ sIf = do
 
 --Parses variable declaration
 sDec = do
-  whitespace 
+  whitespace
   p <- getPosition
   s <- many1 letter
   whitespace
@@ -300,7 +300,7 @@ pterm = try base <|> try parenA <|> try parenB <|> try pneg <|>  try pvar
 pint :: Parser Exp
 pint = do
   whitespace
-  p <- getPosition 
+  p <- getPosition
   n <- many1 digit
   whitespace
   return $ EIntLit p (read n)
@@ -310,7 +310,7 @@ pint = do
 bRight :: Parser Exp
 bRight = do
   whitespace
-  p <- getPosition 
+  p <- getPosition
   string "right"
   whitespace
   return $ EBoolLit p True
@@ -318,7 +318,7 @@ bRight = do
 bWrong :: Parser Exp
 bWrong = do
   whitespace
-  p <- getPosition 
+  p <- getPosition
   string "wrong"
   whitespace
   return $ EBoolLit p False
@@ -328,7 +328,7 @@ bWrong = do
 pvar :: Parser Exp
 pvar = do
   whitespace
-  p <- getPosition 
+  p <- getPosition
   v <- many1 letter
   whitespace
   return $ EVar p v
